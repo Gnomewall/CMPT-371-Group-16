@@ -54,6 +54,8 @@ public class testServer {
 
 	private String drawingPlayer;
 
+	private String keyWord;
+
 	/**
 	 * Launch the application.
 	 */
@@ -106,7 +108,7 @@ public class testServer {
 						allUserNameList.setModel(allDlm);
 						serverMessageBoard.append("Client " + uName + " Connected...\n"); // print message on server that new client has been connected.
 						new MsgRead(clientSocket, uName).start(); // create a thread to read messages
-						new PrepareCLientList().start(); //create a thread to update all the active clients
+						new PrepareClientList().start(); //create a thread to update all the active clients
 					}
 				} catch (IOException ioex) {  // throw any exception occurs
 					ioex.printStackTrace();
@@ -142,9 +144,16 @@ public class testServer {
 								// 	new DataOutputStream(((Socket) allUsersList.get(usr)).getOutputStream())
 								// 			.writeUTF("< " + Id + " >" + msgList[2]); // put message in output stream
 								// }
-								if (drawingPlayer != null && drawingPlayer.equalsIgnoreCase(Id)) {
+
+								// === [THIS IS WHERE THE SERVER GETS WHAT WORD THE DRAWING PLAYER IS TRYING TO DRAW] ===
+								if (drawingPlayer != null && drawingPlayer.equalsIgnoreCase(Id) && keyWord == null) {
+									keyWord = msgList[1];
 									new DataOutputStream(s.getOutputStream())
 												.writeUTF("Your word is: " + msgList[1] + ". You may begin drawing!\n");
+									serverMessageBoard.append("Client " + drawingPlayer + " is drawing: " + keyWord + "\n");
+								} else if (drawingPlayer != null && drawingPlayer.equalsIgnoreCase(Id) && keyWord != null) {
+									new DataOutputStream(s.getOutputStream())
+												.writeUTF("ERROR: You have already declared a word.\n");
 								} else {
 									new DataOutputStream(s.getOutputStream())
 												.writeUTF("ERROR: It is not your turn to draw.\n");
@@ -152,7 +161,7 @@ public class testServer {
 							} catch (Exception e) { // throw exceptions
 								e.printStackTrace();
 							}
-						//}
+						//} // === [THIS IS WHERE THE SERVER HANDLES CHAT BROADCAST] ===
 					} else if (msgList[0].equalsIgnoreCase("broadcast")) { // if broadcast then send message to all active clients
 						
 						Iterator<String> itr1 = allUsersList.keySet().iterator(); // iterate over all users
@@ -177,7 +186,7 @@ public class testServer {
 						activeUserSet.remove(Id); // remove that client from active usre set
 						serverMessageBoard.append(Id + " disconnected....\n"); // print message on server message board
 
-						new PrepareCLientList().start(); // update the active and all user list on UI
+						new PrepareClientList().start(); // update the active and all user list on UI
 
 						Iterator<String> itr = activeUserSet.iterator(); // iterate over other active users
 						while (itr.hasNext()) {
@@ -189,7 +198,7 @@ public class testServer {
 								} catch (Exception e) { // throw errors
 									e.printStackTrace();
 								}
-								new PrepareCLientList().start(); // update the active user list for every client after a user is disconnected
+								new PrepareClientList().start(); // update the active user list for every client after a user is disconnected
 							}
 						}
 						activeDlm.removeElement(Id); // remove client from Jlist for server
@@ -202,7 +211,7 @@ public class testServer {
 		}
 	}
 
-	class PrepareCLientList extends Thread { // it prepares the list of active user to be displayed on the UI
+	class PrepareClientList extends Thread { // it prepares the list of active user to be displayed on the UI
 		@Override
 		public void run() {
 			try {
@@ -280,12 +289,25 @@ public class testServer {
 				drawingPlayer = sarr[rnInt];
 
 				// Inform chosen player
-				Socket tempSock = allUsersList.get(sarr[rnInt]);
-				PrintWriter tempPw = null;
-				try {
-					tempPw = new PrintWriter(tempSock.getOutputStream());
-					tempPw.println("You were selected to draw! Please declare your word.");
-				} catch (Exception exc) {exc.printStackTrace();}
+				// Socket tempSock = allUsersList.get(sarr[rnInt]);
+				// PrintWriter tempPw = null;
+				// try {
+				// 	tempPw = new PrintWriter(tempSock.getOutputStream());
+				// 	tempPw.println("You were selected to draw! Please declare your word.");
+				// } catch (Exception exc) {exc.printStackTrace();}
+
+				Iterator<String> itr1 = allUsersList.keySet().iterator(); // iterate over all users
+				while (itr1.hasNext()) {
+					String usrName = (String) itr1.next();
+					try {
+						if (activeUserSet.contains(usrName)) {
+							new DataOutputStream(((Socket) allUsersList.get(usrName)).getOutputStream())
+									.writeUTF("\nPLAYER " + drawingPlayer + " WILL BE DRAWING NEXT!\n" + drawingPlayer + ", PLEASE DECLARE A WORD.\n");
+						}
+					} catch (Exception excep) {
+						excep.printStackTrace(); // throw exceptions
+					}
+				}
 			}
 		});
 		chooseDrawer.setBounds(526, 30, 218, 60);

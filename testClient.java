@@ -209,17 +209,18 @@ public class testClient extends JFrame {
 				clientActiveUsersList.setEnabled(true);
 			}
 		});
-		oneToNRadioBtn.setSelected(true);
-		oneToNRadioBtn.setBounds(682, 24, 72, 25);
+		//oneToNRadioBtn.setSelected(true); // width 72
+		oneToNRadioBtn.setBounds(770, 24, 120, 25);
 		frame.getContentPane().add(oneToNRadioBtn);
 
 		broadcastBtn = new JRadioButton("Chat");
+		broadcastBtn.setSelected(true);
 		broadcastBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				clientActiveUsersList.setEnabled(false);
 			}
 		});
-		broadcastBtn.setBounds(774, 24, 107, 25);
+		broadcastBtn.setBounds(650, 24, 107, 25);
 		frame.getContentPane().add(broadcastBtn);
 
 		ButtonGroup btngrp = new ButtonGroup();
