@@ -32,39 +32,28 @@ public class testServer {
 
 	private static final long serialVersionUID = 1L;
 
-	private static Map<String, Socket> allUsersList = new ConcurrentHashMap<>(); // keeps the mapping of all the
-																					// usernames used and their socket connections
-	private static Set<String> activeUserSet = new HashSet<>(); // this set keeps track of all the active users 
-
-	private static int port = 8818;  // port number to be used
-
-	private JFrame frame; // jframe variable
-
-	private ServerSocket serverSocket; //server socket variable
-
-	private JTextArea serverMessageBoard; // variable for server message board on UI
-
-	private JList allUserNameList;  // variable on UI
-
-	private JList activeClientList; // variable on UI
-
-	private DefaultListModel<String> activeDlm = new DefaultListModel<String>(); // keeps list of active users for display on UI
-
-	private DefaultListModel<String> allDlm = new DefaultListModel<String>(); // keeps list of all users for display on UI
-
+	private static Map<String, Socket> allUsersList = new ConcurrentHashMap<>(); // Stores usernames and their associated socket
+	private static Set<String> activeUserSet = new HashSet<>(); // Stores usernames of active users
+	private static int port = 7070;  // Port Number
+	private JFrame frame;
+	private ServerSocket serverSocket; // Server's Socket
+	private JTextArea serverMessageBoard; // Server's message board (used to print to GUI)
+	private JList allUserNameList;
+	private JList activeClientList;
+	private DefaultListModel<String> activeDlm = new DefaultListModel<String>(); // List of active users (for GUI)
+	private DefaultListModel<String> allDlm = new DefaultListModel<String>(); // List of users (for GUI)
 	private String drawingPlayer;
-
 	private String keyWord;
 
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {  // functions starts here
+	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					testServer window = new testServer();  // object creation
-					window.frame.setVisible(true); // make jframe visible
+					testServer window = new testServer(); // Create window
+					window.frame.setVisible(true); // Make window visible
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -76,12 +65,12 @@ public class testServer {
 	 * Create the application.
 	 */
 	public testServer() {
-		initialize();  // components of swing app will be initialized here.
+		initialize();  // Swing components initialized here
 		try {
-			serverSocket = new ServerSocket(port);  // create a socket for server
-			serverMessageBoard.append("Server started on port: " + port + "\n"); // print messages to server message board
+			serverSocket = new ServerSocket(port);  // Server Socket Creation
+			serverMessageBoard.append("Server started on port: " + port + "\n"); // Print to Server Message Board
 			serverMessageBoard.append("Waiting for the clients...\n");
-			new ClientAccept().start(); // this will create a thread for client
+			new ClientAccept().start(); // Client thread
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -92,25 +81,26 @@ public class testServer {
 		public void run() {
 			while (true) {
 				try {
-					Socket clientSocket = serverSocket.accept();  // create a socket for client
+					Socket clientSocket = serverSocket.accept();  // Client's socket
 					String uName = new DataInputStream(clientSocket.getInputStream()).readUTF(); // this will receive the username sent from client register view
 					DataOutputStream cOutStream = new DataOutputStream(clientSocket.getOutputStream()); // create an output stream for client
 					if (activeUserSet != null && activeUserSet.contains(uName)) { // if username is in use then we need to prompt user to enter new name
 						cOutStream.writeUTF("Username already taken");
 					} else {
-						allUsersList.put(uName, clientSocket); // add new user to allUserList and activeUserSet
+						allUsersList.put(uName, clientSocket); 
 						activeUserSet.add(uName);
-						cOutStream.writeUTF(""); // clear the existing message
-						activeDlm.addElement(uName); // add this user to the active user JList
-						if (!allDlm.contains(uName)) // if username taken previously then don't add to allUser JList otherwise add it
+						cOutStream.writeUTF("");
+						activeDlm.addElement(uName); 
+						if (!allDlm.contains(uName)) 
 							allDlm.addElement(uName);
-						activeClientList.setModel(activeDlm); // show the active and allUser List to the swing app in JList
+						activeClientList.setModel(activeDlm); 
 						allUserNameList.setModel(allDlm);
-						serverMessageBoard.append("Client " + uName + " Connected...\n"); // print message on server that new client has been connected.
-						new MsgRead(clientSocket, uName).start(); // create a thread to read messages
-						new PrepareClientList().start(); //create a thread to update all the active clients
+						serverMessageBoard.append("Client " + uName + " Connected...\n"); 
+
+						new MsgRead(clientSocket, uName).start(); // Read Messages in new thread
+						new PrepareClientList().start(); // Update active clients list in new thread
 					}
-				} catch (IOException ioex) {  // throw any exception occurs
+				} catch (IOException ioex) {
 					ioex.printStackTrace();
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -119,33 +109,28 @@ public class testServer {
 		}
 	}
 
-	class MsgRead extends Thread { // this class reads the messages coming from client and take appropriate actions
+	// Read incoming messages (This handles chat broadcasts and private messages to the server)
+	class MsgRead extends Thread { 
 		Socket s;
 		String Id;
 
-		private MsgRead(Socket s, String uname) { // socket and username will be provided by client
+		private MsgRead(Socket s, String uname) { 
 			this.s = s;
 			this.Id = uname;
 		}
 
 		@Override
 		public void run() {
-			while (allUserNameList != null && !allUsersList.isEmpty()) {  // if allUserList is not empty then proceed further
+			while (allUserNameList != null && !allUsersList.isEmpty()) { 
 				try {
-					String message = new DataInputStream(s.getInputStream()).readUTF(); // read message from client
-					System.out.println("message read ==> " + message); // just print the message for testing
-					String[] msgList = message.split(":"); // I have used my own identifier to identify what action to take on the received message from client
-														// i have appended actionToBeTaken:clients_for_receiving_msg:message
-					if (msgList[0].equalsIgnoreCase("multicast")) { // if action is multicast then send messages to selected active users
-						//String[] sendToList = msgList[1].split(","); //this variable contains list of clients which will receive message
-						//for (String usr : sendToList) { // for every user send message
-							try {
-								// if (activeUserSet.contains(usr)) { // check again if user is active then send the message
-								// 	new DataOutputStream(((Socket) allUsersList.get(usr)).getOutputStream())
-								// 			.writeUTF("< " + Id + " >" + msgList[2]); // put message in output stream
-								// }
+					String message = new DataInputStream(s.getInputStream()).readUTF(); // Read client message
+					System.out.println("message read ==> " + message); 
+					String[] msgList = message.split(":"); // Identifier; used to differentiate between public / private chat messages
 
-								// === [THIS IS WHERE THE SERVER GETS WHAT WORD THE DRAWING PLAYER IS TRYING TO DRAW] ===
+					// === [THIS IS WHERE THE SERVER HANDLES PRIVATE MESSAGES FOR DECLARING A WORD TO DRAW] ===
+					if (msgList[0].equalsIgnoreCase("multicast")) { 
+							try {
+
 								if (drawingPlayer != null && drawingPlayer.equalsIgnoreCase(Id) && keyWord == null) {
 									keyWord = msgList[1];
 									new DataOutputStream(s.getOutputStream())
@@ -158,51 +143,53 @@ public class testServer {
 									new DataOutputStream(s.getOutputStream())
 												.writeUTF("ERROR: It is not your turn to draw.\n");
 								}
-							} catch (Exception e) { // throw exceptions
+							} catch (Exception e) {
 								e.printStackTrace();
 							}
-						//} // === [THIS IS WHERE THE SERVER HANDLES CHAT BROADCAST] ===
-					} else if (msgList[0].equalsIgnoreCase("broadcast")) { // if broadcast then send message to all active clients
-						
-						Iterator<String> itr1 = allUsersList.keySet().iterator(); // iterate over all users
+
+					// === [THIS IS WHERE THE SERVER HANDLES PUBLIC CHAT BROADCAST] ===
+					} else if (msgList[0].equalsIgnoreCase("broadcast")) {
+
+						// Iterate over all clients
+						Iterator<String> itr1 = allUsersList.keySet().iterator(); 
 						while (itr1.hasNext()) {
-							String usrName = (String) itr1.next(); // it is the username
-							if (!usrName.equalsIgnoreCase(Id)) { // we don't need to send message to ourself, so we check for our Id
+							String usrName = (String) itr1.next();
+							if (!usrName.equalsIgnoreCase(Id)) {
 								try {
-									if (activeUserSet.contains(usrName)) { // if client is active then send message through output stream
+									if (activeUserSet.contains(usrName)) { 
 										new DataOutputStream(((Socket) allUsersList.get(usrName)).getOutputStream())
 												.writeUTF("< " + Id + " >" + msgList[1]);
 									} else {
-										//if user is not active then notify the sender about the disconnected client
 										new DataOutputStream(s.getOutputStream())
 												.writeUTF("Message couldn't be delivered to user " + usrName + " because it is disconnected.\n");
 									}
 								} catch (Exception e) {
-									e.printStackTrace(); // throw exceptions
+									e.printStackTrace(); 
 								}
 							}
 						}
-					} else if (msgList[0].equalsIgnoreCase("exit")) { // if a client's process is killed then notify other clients
-						activeUserSet.remove(Id); // remove that client from active usre set
-						serverMessageBoard.append(Id + " disconnected....\n"); // print message on server message board
+						// A client disconnects
+					} else if (msgList[0].equalsIgnoreCase("exit")) { 
+						activeUserSet.remove(Id); // Remove client from active user set
+						serverMessageBoard.append(Id + " disconnected....\n");
 
-						new PrepareClientList().start(); // update the active and all user list on UI
+						new PrepareClientList().start(); // Update active user list on UI
 
-						Iterator<String> itr = activeUserSet.iterator(); // iterate over other active users
+						Iterator<String> itr = activeUserSet.iterator(); 
 						while (itr.hasNext()) {
 							String usrName2 = (String) itr.next();
-							if (!usrName2.equalsIgnoreCase(Id)) { // we don't need to send this message to ourself
+							if (!usrName2.equalsIgnoreCase(Id)) { 
 								try {
 									new DataOutputStream(((Socket) allUsersList.get(usrName2)).getOutputStream())
-											.writeUTF(Id + " disconnected..."); // notify all other active user for disconnection of a user
-								} catch (Exception e) { // throw errors
+											.writeUTF(Id + " disconnected..."); // Notify all users of disconnection
+								} catch (Exception e) {
 									e.printStackTrace();
 								}
-								new PrepareClientList().start(); // update the active user list for every client after a user is disconnected
+								new PrepareClientList().start(); // Update all client's user lists after disconnection
 							}
 						}
-						activeDlm.removeElement(Id); // remove client from Jlist for server
-						activeClientList.setModel(activeDlm); //update the active user list
+						activeDlm.removeElement(Id); // Remove client from JList
+						activeClientList.setModel(activeDlm); // Update active user list
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -211,21 +198,21 @@ public class testServer {
 		}
 	}
 
-	class PrepareClientList extends Thread { // it prepares the list of active user to be displayed on the UI
+	class PrepareClientList extends Thread { // Prepare list of active users to be displayed on GUI
 		@Override
 		public void run() {
 			try {
 				String ids = "";
-				Iterator itr = activeUserSet.iterator(); // iterate over all active users
-				while (itr.hasNext()) { // prepare string of all the users
+				Iterator itr = activeUserSet.iterator(); // For all active users
+				while (itr.hasNext()) { // Prepare string of all the users
 					String key = (String) itr.next();
 					ids += key + ",";
 				}
-				if (ids.length() != 0) { // just trimming the list for the safe side.
+				if (ids.length() != 0) { // Trim list
 					ids = ids.substring(0, ids.length() - 1);
 				}
 				itr = activeUserSet.iterator(); 
-				while (itr.hasNext()) { // iterate over all active users
+				while (itr.hasNext()) { // Send list of all users
 					String key = (String) itr.next();
 					try {
 						new DataOutputStream(((Socket) allUsersList.get(key)).getOutputStream())
@@ -273,6 +260,7 @@ public class testServer {
 		lblNewLabel_1.setBounds(526, 103, 98, 23);
 		frame.getContentPane().add(lblNewLabel_1);
 
+		// === [THIS IS WHERE THE SERVER CHOOSES A PLAYER TO DRAW] ===
 		JButton chooseDrawer = new JButton("Choose a Player to Draw");
 		chooseDrawer.addActionListener(new ActionListener() { // action to be taken on send message button
 			public void actionPerformed(ActionEvent e) {

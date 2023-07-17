@@ -22,7 +22,7 @@ public class testLogin extends JFrame{
 	 * */
 	private JFrame frame;
 	private JTextField clientUserName;
-	private int port = 8818;
+	private int port = 7070;
 
 	/**
 	 * Launch the application.
