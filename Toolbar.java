@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 public class Toolbar extends JToolBar {
 
     private DrawArea drawArea;
+    private boolean eraserSelected = false;
 
     public Toolbar(DrawArea drawArea) {
 
@@ -19,6 +20,16 @@ public class Toolbar extends JToolBar {
         JButton eraserButton = new JButton("Eraser");
         // JButton colorButton = new JButton("Color");
         JButton clearButton = new JButton("Clear");
+
+        // Eraser Button
+        eraserButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                eraserSelected = true;
+                drawArea.setEraserMode(eraserSelected);
+                drawArea.setBackground(Color.white);
+            }
+        });
 
         // Call clear method in DrawArea.java
         clearButton.addActionListener(new ActionListener() {
@@ -35,5 +46,9 @@ public class Toolbar extends JToolBar {
         add(clearButton);
 
     }
+
+    // public boolean isEraserSelected() {
+    // return eraserSelected;
+    // }
 
 }
