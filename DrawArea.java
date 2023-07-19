@@ -1,5 +1,4 @@
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -10,7 +9,6 @@ import java.awt.event.MouseMotionAdapter;
 
 import javax.swing.JComponent;
 
-import javafx.scene.Cursor;
 
 //REFERENCE:
 //https://www.ssaurel.com/blog/learn-how-to-make-a-swing-painting-and-drawing-application/
@@ -120,8 +118,8 @@ public class DrawArea extends JComponent {
             g2.fillRect(currentX - eraserSize / 2, currentY - eraserSize / 2, eraserSize,
                     eraserSize);
         } else {
-            // Draw with the selected color or tool
-            g2.drawLine(oldX, oldY, currentX, currentY);
+            // Else, change paint color and paint as normal.
+            g2.setPaint(Color.black);
         }
     }
 
