@@ -43,7 +43,9 @@ public class testServer {
 	private DefaultListModel<String> activeDlm = new DefaultListModel<String>(); // List of active users (for GUI)
 	private DefaultListModel<String> allDlm = new DefaultListModel<String>(); // List of users (for GUI)
 	private String drawingPlayer;
-	private String keyWord;
+	private String keyWord;					//define chosen keyword string by player to draw
+	private boolean isGameOver = false;
+
 
 	/**
 	 * Launch the application.
@@ -130,7 +132,7 @@ public class testServer {
 					// === [THIS IS WHERE THE SERVER HANDLES PRIVATE MESSAGES FOR DECLARING A WORD TO DRAW] ===
 					if (msgList[0].equalsIgnoreCase("multicast")) { 
 							try {
-
+								
 								if (drawingPlayer != null && drawingPlayer.equalsIgnoreCase(Id) && keyWord == null) {
 									keyWord = msgList[1];
 									new DataOutputStream(s.getOutputStream())
@@ -154,7 +156,23 @@ public class testServer {
 						Iterator<String> itr1 = allUsersList.keySet().iterator(); 
 						while (itr1.hasNext()) {
 							String usrName = (String) itr1.next();
-							if (!usrName.equalsIgnoreCase(Id)) {
+
+								//added code from here, check/msg all users when guessed correctly 
+								if(!keyWord.isEmpty() && msgList[1].equalsIgnoreCase(keyWord)) {						//check if guess word is correct 
+									isGameOver = true;																	
+									if(Id.equals(usrName) && activeUserSet.contains(usrName)) {					  		//compare if user equals to user who guessed right 
+										new DataOutputStream(((Socket) allUsersList.get(usrName)).getOutputStream()) 	//retrieve user information and cast to socket 
+										.writeUTF("\nYou guessed it correctly");								 	//send string to outpustream of client who won
+									} else if(activeUserSet.contains(usrName)) {										//check for active clients 
+										new DataOutputStream(((Socket) allUsersList.get(usrName)).getOutputStream()) 	//send msg to all other clients saying who was winner 
+										.writeUTF("<"+Id+">" + msgList[1]+ "\n\n"+Id+" is winner!");				
+									} else {
+										new DataOutputStream(s.getOutputStream())
+										.writeUTF("Message couldn't be delivered to user " + usrName + " because it is disconnected.\n");
+									}					
+									//to here 
+
+								} else if (!usrName.equalsIgnoreCase(Id)) { // we don't need to send message to ourself, so we check for our Id
 								try {
 									if (activeUserSet.contains(usrName)) { 
 										new DataOutputStream(((Socket) allUsersList.get(usrName)).getOutputStream())
@@ -180,17 +198,36 @@ public class testServer {
 							String usrName2 = (String) itr.next();
 							if (!usrName2.equalsIgnoreCase(Id)) { 
 								try {
-									new DataOutputStream(((Socket) allUsersList.get(usrName2)).getOutputStream())
-											.writeUTF(Id + " disconnected..."); // Notify all users of disconnection
+									if(!keyWord.isEmpty()) {					//send msg to disconnected client 
+										new DataOutputStream(((Socket) allUsersList.get(usrName2)).getOutputStream())
+										.writeUTF(Id + " disconnected..."); // notify all other active user for disconnection of a user
+									} 
 								} catch (Exception e) {
 									e.printStackTrace();
 								}
 								new PrepareClientList().start(); // Update all client's user lists after disconnection
 							}
 						}
+						//added code here, Remove all users from allUsersList
+						if(keyWord.isEmpty()) {						 
+						allUsersList.remove(Id);					//remove the user from the list from all user
+						allDlm.removeElement(Id);					//GUI representation of the list 
+						}		
+						//to here 
+
 						activeDlm.removeElement(Id); // Remove client from JList
 						activeClientList.setModel(activeDlm); // Update active user list
+						allUserNameList.setModel(allDlm);		
+
 					}
+					
+					//added code here, reset the values when game restarts 
+					if(isGameOver) {				
+						isGameOver = false;			
+						keyWord = "";
+					}		
+					//to here 
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

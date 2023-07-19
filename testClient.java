@@ -98,6 +98,15 @@ public class testClient extends JFrame {
 						}
 					} else {
 						clientMessageBoard.append("" + m + "\n"); //otherwise print on the clients message board
+						
+						//added code here, disconnect all users and close client frame 
+						if(m.endsWith("winner!") || m.endsWith("correctly")) {
+						JOptionPane.showMessageDialog(frame, m);				//show message received from server 
+						outStream.writeUTF("exit"); // closes the thread and show the message on server and client's message board
+						clientMessageBoard.append("You are disconnected now.\n");
+						frame.dispose(); // close the frame 
+					}
+					//to here 
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
