@@ -2,30 +2,92 @@ import javax.swing.*;
 import java.awt.*;
 
 public class drawing_board {
+
+    // REFERENCE:
+    // https://www.ssaurel.com/blog/learn-how-to-make-a-swing-painting-and-drawing-application/
+    DrawArea drawArea;
+    Toolbar toolbar;
+
+    // show canvas/frame
+    public void show() {
+        // create main frame
+        // TODO: name the game
+        JFrame frame = new JFrame("TODO: Name The Game!");
+
+        // get frame container
+        Container content = frame.getContentPane();
+        // set layout on content pane
+        content.setLayout(new BorderLayout());
+
+        // set cursor image
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        Image image = toolkit.getImage("Cursor image/pencil cartoon.png");
+        Cursor c = toolkit.createCustomCursor(image, new Point(content.getX(),
+                content.getY()), "img");
+        content.setCursor(c);
+
+        // create the drawing area
+        drawArea = new DrawArea();
+        toolbar = new Toolbar(drawArea);
+
+        // and add to content pane
+        content.add(drawArea, BorderLayout.CENTER);
+        content.add(toolbar, BorderLayout.SOUTH);
+
+        // set size of frame
+        frame.setSize(600, 600);
+        // can close frame
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // show the swing paint result
+
+        frame.setVisible(true);
+
+    }
+
+    public JPanel get_panel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+
+        // set cursor image
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        Image image = toolkit.getImage("Cursor image/pencil cartoon.png");
+        Cursor c = toolkit.createCustomCursor(image, new Point(panel.getX(),
+                panel.getY()), "img");
+        panel.setCursor(c);
+
+        // create the drawing area
+        drawArea = new DrawArea();
+        toolbar = new Toolbar(drawArea);
+
+        // and add to content pane
+        panel.add(drawArea, BorderLayout.CENTER);
+        panel.add(toolbar, BorderLayout.SOUTH);
+
+        panel.setSize(600, 600);
+
+        panel.setVisible(true);
+
+        return panel;
+    }
+
+    public void show_panel() {
+        JFrame frame = new JFrame();
+        frame.getContentPane().add(get_panel());
+        frame.setSize(800, 800);
+        frame.setVisible(true);
+    }
+
     public static void main(String[] args) {
         // might be useful if we need multiple threads
+        // SwingUtilities.invokeLater(() -> {
+
+        //     // call show method to open window
+        //     new drawing_board().show();
+        // });
         SwingUtilities.invokeLater(() -> {
-            // adding a jFrame and a title to the drawing board. We can probably add the
-            // game title here
-            JFrame frame = new JFrame("TODO: Name The Game!");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-            JPanel canvas = new JPanel() {
-                @Override
-                protected void paintComponent(Graphics g) {
-                    super.paintComponent(g);
-                    // have to add drawing logic here
-                }
-            };
-
-            // the size of the canvas
-            canvas.setPreferredSize(new Dimension(500, 500));
-
-            frame.getContentPane().add(canvas);
-            // frame sizing
-            frame.pack();
-            // makes the things visible on our canvas
-            frame.setVisible(true);
+            // call show method to open window
+            new drawing_board().show_panel();
         });
     }
 
