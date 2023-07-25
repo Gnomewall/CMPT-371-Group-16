@@ -194,6 +194,7 @@ public class client extends JFrame {
 		clientActiveUsersList.setBounds(1154, 63, 327, 457);
 		frame.getContentPane().add(clientActiveUsersList);
 
+		// THIS IS THE KILL BUTTON
 		clientKillProcessBtn = new JButton("Kill Process");
 		clientKillProcessBtn.addActionListener(new ActionListener() { // kill process event
 			public void actionPerformed(ActionEvent e) {
@@ -209,6 +210,7 @@ public class client extends JFrame {
 		});
 		clientKillProcessBtn.setBounds(1303, 533, 193, 84);
 		frame.getContentPane().add(clientKillProcessBtn);
+		// END OF KILL BUTTON
 
 		JLabel lblNewLabel = new JLabel("Active Users");
 		lblNewLabel.setHorizontalAlignment(SwingConstants.LEFT);
