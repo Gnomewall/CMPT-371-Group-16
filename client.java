@@ -118,13 +118,13 @@ public class client extends JFrame {
 								// ]==================
 						String mtemp = m.substring(m.lastIndexOf(">") + 1);
 						System.out.println("mtemp: " + mtemp);
-						if (mtemp != null && mtemp.matches("paint,\\d+,\\d+,\\d+,\\d+")) {
+						if (mtemp != null && mtemp.matches("paint,-?\\d+,-?\\d+,-?\\d+,-?\\d+")) {
 							// TESTING
 							System.out.println("True!");
 							String[] mSplit = mtemp.split(",");
 							whiteboard.drawArea.drawHelper(Integer.parseInt(mSplit[1]), Integer.parseInt(mSplit[2]),
 									Integer.parseInt(mSplit[3]), Integer.parseInt(mSplit[4]));
-						} else if (mtemp != null && mtemp.matches("erase,\\d+,\\d+")) {
+						} else if (mtemp != null && mtemp.matches("erase,-?\\d+,-?\\d+")) {
 							// TESTING FOR ERASER
 							System.out.println("Erasing!");
 							String[] mSplit = mtemp.split(",");
