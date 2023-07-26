@@ -21,13 +21,12 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-
 public class client extends JFrame {
 
 	/*
 	 * References: https://www.youtube.com/watch?v=rd272SCl-XE
-	 * 			   https://www.youtube.com/watch?v=ZzZeteJGncY
-	 * */
+	 * https://www.youtube.com/watch?v=ZzZeteJGncY
+	 */
 	private static final long serialVersionUID = 1L;
 	private JFrame frame;
 	private JTextField clientTypingBoard;
@@ -41,7 +40,7 @@ public class client extends JFrame {
 	private drawing_board whiteboard;
 
 	private boolean buzzing = false;
-	
+	private boolean buzzerEnabled = true;
 
 	DataInputStream inputStream;
 	DataOutputStream outStream;
@@ -51,18 +50,18 @@ public class client extends JFrame {
 	/**
 	 * Launch the application.
 	 */
-//	public static void main(String[] args) {
-//		EventQueue.invokeLater(new Runnable() {
-//			public void run() {
-//				try {
-//					ClientView window = new ClientView();
-//					window.frame.setVisible(true);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-//	}
+	// public static void main(String[] args) {
+	// EventQueue.invokeLater(new Runnable() {
+	// public void run() {
+	// try {
+	// ClientView window = new ClientView();
+	// window.frame.setVisible(true);
+	// } catch (Exception e) {
+	// e.printStackTrace();
+	// }
+	// }
+	// });
+	// }
 
 	/**
 	 * Create the application.
@@ -93,8 +92,17 @@ public class client extends JFrame {
 		public void run() {
 			while (true) {
 				try {
-					String m = inputStream.readUTF();  // read message from server, this will contain :;.,/=<comma seperated clientsIds>
+					String m = inputStream.readUTF(); // read message from server, this will contain :;.,/=<comma
+														// seperated clientsIds>
 					System.out.println("inside read thread : " + m); // print message for testing purpose
+
+					if (m.equals("buzz")){
+						buzzerEnabled = false; // disable our buzzer
+						clientTypingBoard.setVisible(buzzerEnabled);
+					}else if (m.equals("unbuzz")) {
+						buzzerEnabled = true; // reenable our buzzer
+					}
+
 					if (m.contains(":;.,/=")) { // prefix(i know its random)
 						m = m.substring(6); // comma separated all active user ids
 						dm.clear(); // clear the list before inserting fresh elements
@@ -105,29 +113,31 @@ public class client extends JFrame {
 								dm.addElement(u); // add all the active user ids to the defaultList to display on active
 													// user pane on client view
 						}
-					} else { // ==============[ THIS IS WHERE WE CHECK FOR DRAWING COMMANDS ]==================
-						String mtemp = m.substring(m.lastIndexOf(">")+1);
+					} else { // ==============[ THIS IS WHERE WE CHECK FOR DRAWING COMMANDS
+								// ]==================
+						String mtemp = m.substring(m.lastIndexOf(">") + 1);
 						System.out.println("mtemp: " + mtemp);
 						if (mtemp != null && mtemp.matches("paint,\\d+,\\d+,\\d+,\\d+")) {
 							// TESTING
 							System.out.println("True!");
 							String[] mSplit = mtemp.split(",");
-							whiteboard.drawArea.drawHelper(Integer.parseInt(mSplit[1]),Integer.parseInt(mSplit[2]),Integer.parseInt(mSplit[3]),Integer.parseInt(mSplit[4]));
-						}
-						else {
-							clientMessageBoard.append("" + m + "\n"); //otherwise print on the clients message board
+							whiteboard.drawArea.drawHelper(Integer.parseInt(mSplit[1]), Integer.parseInt(mSplit[2]),
+									Integer.parseInt(mSplit[3]), Integer.parseInt(mSplit[4]));
+						} else {
+							clientMessageBoard.append("" + m + "\n"); // otherwise print on the clients message board
 						}
 						// TESTING
-						//whiteboard.drawArea.drawHelper(12, 25, 100,250);
+						// whiteboard.drawArea.drawHelper(12, 25, 100,250);
 
-						//added code here, disconnect all users and close client frame 
-						if(m.endsWith("winner!") || m.endsWith("correctly")) {
-						JOptionPane.showMessageDialog(frame, m);				//show message received from server 
-						outStream.writeUTF("exit"); // closes the thread and show the message on server and client's message board
-						clientMessageBoard.append("You are disconnected now.\n");
-						frame.dispose(); // close the frame 
-					}
-					//to here 
+						// added code here, disconnect all users and close client frame
+						if (m.endsWith("winner!") || m.endsWith("correctly")) {
+							JOptionPane.showMessageDialog(frame, m); // show message received from server
+							outStream.writeUTF("exit"); // closes the thread and show the message on server and client's
+														// message board
+							clientMessageBoard.append("You are disconnected now.\n");
+							frame.dispose(); // close the frame
+						}
+						// to here
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -168,8 +178,17 @@ public class client extends JFrame {
 		frame.getContentPane().add(buzzerBtn);
 		buzzerBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				buzzing = true; // toggles the buzzing flag so that the text box will show
-				clientTypingBoard.setVisible(buzzing); // makes the text box visible
+				if (buzzerEnabled) {
+					buzzing = true; // toggles the buzzing flag so that the text box will show
+					clientTypingBoard.setVisible(buzzing); // makes the text box visible
+					try {
+						outStream.writeUTF("buzz"); // sends a message to server that someone is buzzing
+					} catch (Exception ex) {
+						// TODO: handle exception
+					}
+					
+				}
+
 			}
 		});
 
@@ -177,49 +196,69 @@ public class client extends JFrame {
 		clientSendMsgBtn.addActionListener(new ActionListener() { // action to be taken on send message button
 			public void actionPerformed(ActionEvent e) {
 				buzzing = false;
+				try {
+						outStream.writeUTF("unbuzz"); // sends a message to server that someone is buzzing
+					} catch (Exception ex) {
+						// TODO: handle exception
+					}
 				// hides the text field again and shows the buzzer if the user sends a guess
 				// maybe add a timer?
 				clientTypingBoard.setVisible(buzzing);
 				buzzerBtn.setVisible(!buzzing);
 				String textAreaMessage = clientTypingBoard.getText(); // get the message from textbox
-				if (textAreaMessage != null && !textAreaMessage.isEmpty()) {  // only if message is not empty then send it further otherwise do nothing
+				if (textAreaMessage != null && !textAreaMessage.isEmpty()) { // only if message is not empty then send
+																				// it further otherwise do nothing
 					try {
 						String messageToBeSentToServer = "";
 						String cast = "broadcast"; // this will be an identifier to identify type of message
-						int flag = 0; // flag used to check whether used has selected any client or not for multicast 
+						int flag = 0; // flag used to check whether used has selected any client or not for multicast
 						if (oneToNRadioBtn.isSelected()) { // if 1-to-N is selected then do this
-							cast = "multicast"; 
-							// List<String> clientList = clientActiveUsersList.getSelectedValuesList(); // get all the users selected on UI
-							// if (clientList.size() == 0) // if no user is selected then set the flag for further use
-							// 	flag = 1;
-							// for (String selectedUsr : clientList) { // append all the usernames selected in a variable
-							// 	if (clientIds.isEmpty())
-							// 		clientIds += selectedUsr;
-							// 	else
-							// 		clientIds += "," + selectedUsr;
+							cast = "multicast";
+							// List<String> clientList = clientActiveUsersList.getSelectedValuesList(); //
+							// get all the users selected on UI
+							// if (clientList.size() == 0) // if no user is selected then set the flag for
+							// further use
+							// flag = 1;
+							// for (String selectedUsr : clientList) { // append all the usernames selected
+							// in a variable
+							// if (clientIds.isEmpty())
+							// clientIds += selectedUsr;
+							// else
+							// clientIds += "," + selectedUsr;
 							// }
-							//messageToBeSentToServer = cast + ":" + clientIds + ":" + textAreaMessage; // prepare message to be sent to server
+							// messageToBeSentToServer = cast + ":" + clientIds + ":" + textAreaMessage; //
+							// prepare message to be sent to server
 							messageToBeSentToServer = cast + ":" + textAreaMessage;
 						} else {
-							messageToBeSentToServer = cast + ":" + textAreaMessage; // in case of broadcast we don't need to know userIds
+							messageToBeSentToServer = cast + ":" + textAreaMessage; // in case of broadcast we don't
+																					// need to know userIds
 						}
-						if (cast.equalsIgnoreCase("multicast")) { 
-							//if (flag == 1) { // for multicast check if no user was selected then prompt a message dialog
-							//	JOptionPane.showMessageDialog(frame, "No user selected");
-							//} 
-							//else { // otherwise just send the message to the user
-								outStream.writeUTF(messageToBeSentToServer);
-								clientTypingBoard.setText("");
-								clientMessageBoard.append("< You sent msg to server>" + textAreaMessage + "\n"); //show the sent message to the sender's message board
-							//}
+						if (cast.equalsIgnoreCase("multicast")) {
+							// if (flag == 1) { // for multicast check if no user was selected then prompt a
+							// message dialog
+							// JOptionPane.showMessageDialog(frame, "No user selected");
+							// }
+							// else { // otherwise just send the message to the user
+							outStream.writeUTF(messageToBeSentToServer);
+							clientTypingBoard.setText("");
+							clientMessageBoard.append("< You sent msg to server>" + textAreaMessage + "\n"); // show the
+																												// sent
+																												// message
+																												// to
+																												// the
+																												// sender's
+																												// message
+																												// board
+							// }
 						} else { // in case of broadcast
 							outStream.writeUTF(messageToBeSentToServer);
 							clientTypingBoard.setText("");
 							clientMessageBoard.append("< You sent msg to All >" + textAreaMessage + "\n");
 						}
-						clientIds = ""; // clear the all the client ids 
+						clientIds = ""; // clear the all the client ids
 					} catch (Exception ex) {
-						JOptionPane.showMessageDialog(frame, "User does not exist anymore."); // if user doesn't exist then show message
+						JOptionPane.showMessageDialog(frame, "User does not exist anymore."); // if user doesn't exist
+																								// then show message
 					}
 				}
 			}
@@ -240,7 +279,7 @@ public class client extends JFrame {
 					outStream.writeUTF("exit"); // closes the thread and show the message on server and client's message
 												// board
 					clientMessageBoard.append("You are disconnected now.\n");
-					frame.dispose(); // close the frame 
+					frame.dispose(); // close the frame
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
@@ -261,7 +300,7 @@ public class client extends JFrame {
 				clientActiveUsersList.setEnabled(true);
 			}
 		});
-		//oneToNRadioBtn.setSelected(true); // width 72
+		// oneToNRadioBtn.setSelected(true); // width 72
 		oneToNRadioBtn.setBounds(1370, 24, 120, 25);
 		frame.getContentPane().add(oneToNRadioBtn);
 
@@ -287,4 +326,5 @@ public class client extends JFrame {
 
 		frame.setVisible(true);
 	}
+
 }

@@ -46,6 +46,8 @@ public class server {
 	private String keyWord;					//define chosen keyword string by player to draw
 	private boolean isGameOver = false;
 
+	
+
 
 	/**
 	 * Launch the application.
@@ -128,6 +130,34 @@ public class server {
 					String message = new DataInputStream(s.getInputStream()).readUTF(); // Read client message
 					System.out.println("message read ==> " + message); 
 					String[] msgList = message.split(":"); // Identifier; used to differentiate between public / private chat messages
+
+					if (msgList[0].equals("buzz")) {
+						Iterator<String> itr = allUsersList.keySet().iterator();
+                    	while (itr.hasNext()) {
+                       		String usrName = (String) itr.next();
+                        	if (!usrName.equalsIgnoreCase(Id)) {
+                            	try {
+                                	new DataOutputStream(((Socket) allUsersList.get(usrName)).getOutputStream())
+                                    	    .writeUTF("buzz");
+                            	} catch (Exception e) {
+                                	e.printStackTrace();
+                            	}
+                        	}
+                   		}
+					} else if (msgList[0].equals("unbuzz")){
+						Iterator<String> itr = allUsersList.keySet().iterator();
+                    	while (itr.hasNext()) {
+                       		String usrName = (String) itr.next();
+                        	if (!usrName.equalsIgnoreCase(Id)) {
+                            	try {
+                                	new DataOutputStream(((Socket) allUsersList.get(usrName)).getOutputStream())
+                                    	    .writeUTF("unbuzz");
+                            	} catch (Exception e) {
+                                	e.printStackTrace();
+                            	}
+                        	}
+                   		}
+					}
 
 					// === [THIS IS WHERE THE SERVER HANDLES PRIVATE MESSAGES FOR DECLARING A WORD TO DRAW] ===
 					if (msgList[0].equalsIgnoreCase("multicast")) { 
