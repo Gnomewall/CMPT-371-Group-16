@@ -6,6 +6,8 @@ import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.io.DataOutputStream;
+import java.net.Socket;
 
 import javax.swing.JComponent;
 
@@ -23,6 +25,8 @@ public class DrawArea extends JComponent {
     private int currentX, currentY, oldX, oldY;
     private boolean eraserMode = false;
     private int eraserSize = 10;
+
+    private Socket socket;
 
     public DrawArea() {
         setDoubleBuffered(false);
@@ -67,6 +71,14 @@ public class DrawArea extends JComponent {
                     } else {
                         // Draw with the selected color or tool
                         g2.drawLine(oldX, oldY, currentX, currentY);
+                        
+                        String message = "broadcast:paint," + oldX + ","+ oldY + ","+ currentX + ","+ currentY;
+                        try {
+                            DataOutputStream outStream = new DataOutputStream(socket.getOutputStream());
+                            outStream.writeUTF(message);
+                        } catch (Exception excep) {
+                            excep.printStackTrace();
+                        }
                     }
 
                     // refresh draw area to repaint
@@ -78,6 +90,19 @@ public class DrawArea extends JComponent {
             }
         });
 
+    }
+
+    public void setSocket(Socket s) {
+        socket = s;
+    }
+
+    // ****************************************************************************
+    // * THIS SHOULD BE USED/CALLED BY "client.java" !!!
+    // *
+    // ****************************************************************************
+    public void drawHelper(int ox, int oy, int x, int y) {
+        g2.drawLine(ox, oy, x, y);
+        repaint();
     }
 
     protected void paintComponent(Graphics g) {

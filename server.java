@@ -186,8 +186,9 @@ public class server {
 								}
 							}
 						}
-						// A client disconnects
-					} else if (msgList[0].equalsIgnoreCase("exit")) { 
+						
+					}
+						else if (msgList[0].equalsIgnoreCase("exit")) { 
 						activeUserSet.remove(Id); // Remove client from active user set
 						serverMessageBoard.append(Id + " disconnected....\n");
 

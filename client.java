@@ -36,7 +36,8 @@ public class client extends JFrame {
 	private JRadioButton oneToNRadioBtn;
 	private JRadioButton broadcastBtn;
 
-	private JPanel whiteboard;
+	private JPanel whiteboard_panel;
+	private drawing_board whiteboard;
 
 	DataInputStream inputStream;
 	DataOutputStream outStream;
@@ -69,6 +70,7 @@ public class client extends JFrame {
 
 	public client(String id, Socket s) { // constructor call, it will initialize required variables
 		initialize(); // initilize UI components
+		whiteboard.drawArea.setSocket(s); // TEST
 		this.id = id;
 		try {
 			frame.setTitle("Client View - " + id); // set title of UI
@@ -99,9 +101,21 @@ public class client extends JFrame {
 								dm.addElement(u); // add all the active user ids to the defaultList to display on active
 													// user pane on client view
 						}
-					} else {
-						clientMessageBoard.append("" + m + "\n"); //otherwise print on the clients message board
-						
+					} else { // ==============[ THIS IS WHERE WE CHECK FOR DRAWING COMMANDS ]==================
+						String mtemp = m.substring(m.lastIndexOf(">")+1);
+						System.out.println("mtemp: " + mtemp);
+						if (mtemp != null && mtemp.matches("paint,\\d+,\\d+,\\d+,\\d+")) {
+							// TESTING
+							System.out.println("True!");
+							String[] mSplit = mtemp.split(",");
+							whiteboard.drawArea.drawHelper(Integer.parseInt(mSplit[1]),Integer.parseInt(mSplit[2]),Integer.parseInt(mSplit[3]),Integer.parseInt(mSplit[4]));
+						}
+						else {
+							clientMessageBoard.append("" + m + "\n"); //otherwise print on the clients message board
+						}
+						// TESTING
+						//whiteboard.drawArea.drawHelper(12, 25, 100,250);
+
 						//added code here, disconnect all users and close client frame 
 						if(m.endsWith("winner!") || m.endsWith("correctly")) {
 						JOptionPane.showMessageDialog(frame, m);				//show message received from server 
@@ -241,9 +255,11 @@ public class client extends JFrame {
 		btngrp.add(oneToNRadioBtn);
 		btngrp.add(broadcastBtn);
 
-		whiteboard = new drawing_board().get_panel();
-		whiteboard.setBounds(12, 25, 550, 600);
-		frame.getContentPane().add(whiteboard);
+		whiteboard = new drawing_board();
+		// whiteboard_panel = new drawing_board().get_panel();
+		whiteboard_panel = whiteboard.get_panel();
+		whiteboard_panel.setBounds(12, 25, 550, 600);
+		frame.getContentPane().add(whiteboard_panel);
 
 		frame.setVisible(true);
 	}

@@ -5,7 +5,7 @@ public class drawing_board {
 
     // REFERENCE:
     // https://www.ssaurel.com/blog/learn-how-to-make-a-swing-painting-and-drawing-application/
-    DrawArea drawArea;
+    public DrawArea drawArea;
     Toolbar toolbar;
 
     // show canvas/frame
@@ -68,6 +68,10 @@ public class drawing_board {
         panel.setVisible(true);
 
         return panel;
+    }
+
+    drawing_board() {
+        
     }
 
     public void show_panel() {
