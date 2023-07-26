@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.DataInputStream;
@@ -38,6 +39,9 @@ public class client extends JFrame {
 
 	private JPanel whiteboard_panel;
 	private drawing_board whiteboard;
+
+	private boolean buzzing = false;
+	
 
 	DataInputStream inputStream;
 	DataOutputStream outStream;
@@ -148,15 +152,35 @@ public class client extends JFrame {
 		clientMessageBoard.setBounds(612, 25, 530, 495);
 		frame.getContentPane().add(clientMessageBoard);
 
+		// chat box field
 		clientTypingBoard = new JTextField();
 		clientTypingBoard.setHorizontalAlignment(SwingConstants.LEFT);
 		clientTypingBoard.setBounds(612, 533, 530, 84);
 		frame.getContentPane().add(clientTypingBoard);
 		clientTypingBoard.setColumns(10);
+		// should only show the text box if a person is buzzing in
+		clientTypingBoard.setVisible(buzzing);
+
+		// buzzer button
+		JButton buzzerBtn = new JButton("Buzzer");
+		buzzerBtn.setBounds(612, 533, 530, 84);
+		buzzerBtn.setBackground(Color.RED);
+		frame.getContentPane().add(buzzerBtn);
+		buzzerBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				buzzing = true; // toggles the buzzing flag so that the text box will show
+				clientTypingBoard.setVisible(buzzing); // makes the text box visible
+			}
+		});
 
 		JButton clientSendMsgBtn = new JButton("Send");
 		clientSendMsgBtn.addActionListener(new ActionListener() { // action to be taken on send message button
 			public void actionPerformed(ActionEvent e) {
+				buzzing = false;
+				// hides the text field again and shows the buzzer if the user sends a guess
+				// maybe add a timer?
+				clientTypingBoard.setVisible(buzzing);
+				buzzerBtn.setVisible(!buzzing);
 				String textAreaMessage = clientTypingBoard.getText(); // get the message from textbox
 				if (textAreaMessage != null && !textAreaMessage.isEmpty()) {  // only if message is not empty then send it further otherwise do nothing
 					try {
