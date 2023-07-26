@@ -1,12 +1,20 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.io.DataOutputStream;
+import java.net.Socket;
 import java.awt.event.ActionEvent;
 
 public class Toolbar extends JToolBar {
 
     private DrawArea drawArea;
     private boolean eraserSelected = false;
+
+    private Socket socket;
+
+    public void setSocket(Socket s) {
+        socket = s;
+    }
 
     public Toolbar(DrawArea drawArea) {
 
@@ -59,6 +67,14 @@ public class Toolbar extends JToolBar {
                 drawArea.setEraserMode(eraserSelected);
                 drawArea.setCursor(pencilCursor);
 
+
+                String message = "broadcast:erase,all,clear";
+                try {
+                    DataOutputStream outStream = new DataOutputStream(socket.getOutputStream());
+                    outStream.writeUTF(message);
+                } catch (Exception excep) {
+                    excep.printStackTrace();
+                }
             }
         });
 

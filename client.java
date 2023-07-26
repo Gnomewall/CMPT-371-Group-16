@@ -74,6 +74,7 @@ public class client extends JFrame {
 	public client(String id, Socket s) { // constructor call, it will initialize required variables
 		initialize(); // initilize UI components
 		whiteboard.drawArea.setSocket(s); // TEST
+		whiteboard.toolbar.setSocket(s);
 		this.id = id;
 		try {
 			frame.setTitle("Client View - " + id); // set title of UI
@@ -103,7 +104,7 @@ public class client extends JFrame {
 						buzzerEnabled = true; // reenable our buzzer
 					}
 
-					if (m.contains(":;.,/=")) { // prefix(i know its random)
+					else if (m.contains(":;.,/=")) { // prefix(i know its random)
 						m = m.substring(6); // comma separated all active user ids
 						dm.clear(); // clear the list before inserting fresh elements
 						StringTokenizer st = new StringTokenizer(m, ","); // split all the clientIds and add to dm below
@@ -123,7 +124,17 @@ public class client extends JFrame {
 							String[] mSplit = mtemp.split(",");
 							whiteboard.drawArea.drawHelper(Integer.parseInt(mSplit[1]), Integer.parseInt(mSplit[2]),
 									Integer.parseInt(mSplit[3]), Integer.parseInt(mSplit[4]));
-						} else {
+						} else if (mtemp != null && mtemp.matches("erase,\\d+,\\d+")) {
+							// TESTING FOR ERASER
+							System.out.println("Erasing!");
+							String[] mSplit = mtemp.split(",");
+							whiteboard.drawArea.eraseHelper(Integer.parseInt(mSplit[1]), Integer.parseInt(mSplit[2]));
+						} else if (mtemp != null && mtemp.equals("erase,all,clear")) {
+							// TESTING FOR ERASER
+							System.out.println("Clearing!");
+							whiteboard.drawArea.clear();
+						}
+						else {
 							clientMessageBoard.append("" + m + "\n"); // otherwise print on the clients message board
 						}
 						// TESTING
@@ -319,6 +330,7 @@ public class client extends JFrame {
 		btngrp.add(broadcastBtn);
 
 		whiteboard = new drawing_board();
+		
 		// whiteboard_panel = new drawing_board().get_panel();
 		whiteboard_panel = whiteboard.get_panel();
 		whiteboard_panel.setBounds(12, 25, 550, 600);

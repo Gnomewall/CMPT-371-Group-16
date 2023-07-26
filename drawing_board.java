@@ -6,7 +6,7 @@ public class drawing_board {
     // REFERENCE:
     // https://www.ssaurel.com/blog/learn-how-to-make-a-swing-painting-and-drawing-application/
     public DrawArea drawArea;
-    Toolbar toolbar;
+    public Toolbar toolbar;
 
     // show canvas/frame
     public void show() {

@@ -68,6 +68,14 @@ public class DrawArea extends JComponent {
                         g2.setColor(getBackground()); // Use the background color to simulate erasing
                         g2.fillRect(currentX - eraserSize / 2, currentY - eraserSize / 2, eraserSize,
                                 eraserSize);
+
+                        String message = "broadcast:erase," + currentX + ","+ currentY;
+                        try {
+                            DataOutputStream outStream = new DataOutputStream(socket.getOutputStream());
+                            outStream.writeUTF(message);
+                        } catch (Exception excep) {
+                            excep.printStackTrace();
+                        }
                     } else {
                         // Draw with the selected color or tool
                         g2.drawLine(oldX, oldY, currentX, currentY);
@@ -101,7 +109,19 @@ public class DrawArea extends JComponent {
     // *
     // ****************************************************************************
     public void drawHelper(int ox, int oy, int x, int y) {
+        g2.setColor(Color.black);
         g2.drawLine(ox, oy, x, y);
+        repaint();
+    }
+
+    // ****************************************************************************
+    // * THIS SHOULD BE USED/CALLED BY "client.java" !!!
+    // *
+    // ****************************************************************************
+    public void eraseHelper(int x, int y) {
+        g2.setColor(Color.white);
+        g2.fillRect(x - eraserSize / 2, y - eraserSize / 2, eraserSize, eraserSize);
+        g2.setColor(Color.black);
         repaint();
     }
 
