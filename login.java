@@ -1,4 +1,3 @@
-import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,18 +26,18 @@ public class login extends JFrame{
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) { // main function which will make UI visible
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					login window = new login();
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+//	public static void main(String[] args) { // main function which will make UI visible
+//		EventQueue.invokeLater(new Runnable() {
+//			public void run() {
+//				try {
+//					login window = new login();
+//					window.frame.setVisible(true);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		});
+//	}
 
 	/**
 	 * Create the application.
@@ -46,7 +45,11 @@ public class login extends JFrame{
 	public login() {
 		initialize();
 	}
-	
+
+	public JFrame getFrame(){
+		return frame;
+	}
+
 	/**
 	 * Initialize the contents of the frame.
 	 */
@@ -71,7 +74,7 @@ public class login extends JFrame{
 					DataInputStream inputStream = new DataInputStream(s.getInputStream()); // create input and output stream
 					DataOutputStream outStream = new DataOutputStream(s.getOutputStream());
 					outStream.writeUTF(id); // send username to the output stream
-					
+
 					String msgFromServer = new DataInputStream(s.getInputStream()).readUTF(); // receive message on socket
 					if(msgFromServer.equals("Username already taken")) {//if server sent this message then prompt user to enter other username
 						JOptionPane.showMessageDialog(frame,  "Username already taken\n"); // show message in other dialog box
@@ -84,7 +87,7 @@ public class login extends JFrame{
 				}
 			}
 		});
-		
+
 		clientLoginBtn.setFont(new Font("Tahoma", Font.PLAIN, 17));
 		clientLoginBtn.setBounds(207, 139, 132, 61);
 		frame.getContentPane().add(clientLoginBtn);
@@ -96,5 +99,5 @@ public class login extends JFrame{
 		frame.getContentPane().add(lblNewLabel);
 	}
 
-	
+
 }

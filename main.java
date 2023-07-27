@@ -1,5 +1,4 @@
 import javax.swing.*;
-import java.awt.*;
 
 class scribble {
     public static void main(String[] args) {
@@ -7,7 +6,7 @@ class scribble {
         SwingUtilities.invokeLater(() -> {
 
             // call show method to open window
-            new drawing_board().show();
+//            new drawing_board().show();
         });
     }
 }

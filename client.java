@@ -5,7 +5,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.swing.ButtonGroup;
@@ -94,7 +93,7 @@ public class client extends JFrame {
 			while (true) {
 				try {
 					String m = inputStream.readUTF(); // read message from server, this will contain :;.,/=<comma
-														// seperated clientsIds>
+					// seperated clientsIds>
 					System.out.println("inside read thread : " + m); // print message for testing purpose
 
 					if (m.equals("buzz")){
@@ -112,10 +111,10 @@ public class client extends JFrame {
 							String u = st.nextToken();
 							if (!id.equals(u)) // we do not need to show own user id in the active user list pane
 								dm.addElement(u); // add all the active user ids to the defaultList to display on active
-													// user pane on client view
+							// user pane on client view
 						}
 					} else { // ==============[ THIS IS WHERE WE CHECK FOR DRAWING COMMANDS
-								// ]==================
+						// ]==================
 						String mtemp = m.substring(m.lastIndexOf(">") + 1);
 						System.out.println("mtemp: " + mtemp);
 						if (mtemp != null && mtemp.matches("paint,-?\\d+,-?\\d+,-?\\d+,-?\\d+")) {
@@ -144,7 +143,7 @@ public class client extends JFrame {
 						if (m.endsWith("winner!") || m.endsWith("correctly")) {
 							JOptionPane.showMessageDialog(frame, m); // show message received from server
 							outStream.writeUTF("exit"); // closes the thread and show the message on server and client's
-														// message board
+							// message board
 							clientMessageBoard.append("You are disconnected now.\n");
 							frame.dispose(); // close the frame
 						}
@@ -163,20 +162,20 @@ public class client extends JFrame {
 	 */
 	private void initialize() { // initialize all the components of UI
 		frame = new JFrame();
-		frame.setBounds(100, 100, 1526, 705);
+		frame.setBounds(50, 50, 1200, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		frame.setTitle("Client View");
 
 		clientMessageBoard = new JTextArea();
 		clientMessageBoard.setEditable(false);
-		clientMessageBoard.setBounds(612, 25, 530, 495);
+		clientMessageBoard.setBounds(600, 25, 300, 400);
 		frame.getContentPane().add(clientMessageBoard);
 
 		// chat box field
 		clientTypingBoard = new JTextField();
 		clientTypingBoard.setHorizontalAlignment(SwingConstants.LEFT);
-		clientTypingBoard.setBounds(612, 533, 530, 84);
+		clientTypingBoard.setBounds(600, 450, 300, 80);
 		frame.getContentPane().add(clientTypingBoard);
 		clientTypingBoard.setColumns(10);
 		// should only show the text box if a person is buzzing in
@@ -184,7 +183,7 @@ public class client extends JFrame {
 
 		// buzzer button
 		JButton buzzerBtn = new JButton("Buzzer");
-		buzzerBtn.setBounds(612, 533, 530, 84);
+		buzzerBtn.setBounds(600, 450, 300, 80);
 		buzzerBtn.setBackground(Color.RED);
 		frame.getContentPane().add(buzzerBtn);
 		buzzerBtn.addActionListener(new ActionListener() {
@@ -197,7 +196,7 @@ public class client extends JFrame {
 					} catch (Exception ex) {
 						// TODO: handle exception
 					}
-					
+
 				}
 
 			}
@@ -208,17 +207,17 @@ public class client extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				buzzing = false;
 				try {
-						outStream.writeUTF("unbuzz"); // sends a message to server that someone is buzzing
-					} catch (Exception ex) {
-						// TODO: handle exception
-					}
+					outStream.writeUTF("unbuzz"); // sends a message to server that someone is buzzing
+				} catch (Exception ex) {
+					// TODO: handle exception
+				}
 				// hides the text field again and shows the buzzer if the user sends a guess
 				// maybe add a timer?
 				clientTypingBoard.setVisible(buzzing);
 				buzzerBtn.setVisible(!buzzing);
 				String textAreaMessage = clientTypingBoard.getText(); // get the message from textbox
 				if (textAreaMessage != null && !textAreaMessage.isEmpty()) { // only if message is not empty then send
-																				// it further otherwise do nothing
+					// it further otherwise do nothing
 					try {
 						String messageToBeSentToServer = "";
 						String cast = "broadcast"; // this will be an identifier to identify type of message
@@ -242,7 +241,7 @@ public class client extends JFrame {
 							messageToBeSentToServer = cast + ":" + textAreaMessage;
 						} else {
 							messageToBeSentToServer = cast + ":" + textAreaMessage; // in case of broadcast we don't
-																					// need to know userIds
+							// need to know userIds
 						}
 						if (cast.equalsIgnoreCase("multicast")) {
 							// if (flag == 1) { // for multicast check if no user was selected then prompt a
@@ -253,13 +252,13 @@ public class client extends JFrame {
 							outStream.writeUTF(messageToBeSentToServer);
 							clientTypingBoard.setText("");
 							clientMessageBoard.append("< You sent msg to server>" + textAreaMessage + "\n"); // show the
-																												// sent
-																												// message
-																												// to
-																												// the
-																												// sender's
-																												// message
-																												// board
+							// sent
+							// message
+							// to
+							// the
+							// sender's
+							// message
+							// board
 							// }
 						} else { // in case of broadcast
 							outStream.writeUTF(messageToBeSentToServer);
@@ -269,17 +268,17 @@ public class client extends JFrame {
 						clientIds = ""; // clear the all the client ids
 					} catch (Exception ex) {
 						JOptionPane.showMessageDialog(frame, "User does not exist anymore."); // if user doesn't exist
-																								// then show message
+						// then show message
 					}
 				}
 			}
 		});
-		clientSendMsgBtn.setBounds(1154, 533, 137, 84);
+		clientSendMsgBtn.setBounds(950, 450, 200, 84);
 		frame.getContentPane().add(clientSendMsgBtn);
 
 		clientActiveUsersList = new JList();
 		clientActiveUsersList.setToolTipText("Active Users");
-		clientActiveUsersList.setBounds(1154, 63, 327, 457);
+		clientActiveUsersList.setBounds(950, 50, 200, 375);
 		frame.getContentPane().add(clientActiveUsersList);
 
 		// THIS IS THE KILL BUTTON
@@ -288,7 +287,7 @@ public class client extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					outStream.writeUTF("exit"); // closes the thread and show the message on server and client's message
-												// board
+					// board
 					clientMessageBoard.append("You are disconnected now.\n");
 					frame.dispose(); // close the frame
 				} catch (IOException e1) {
@@ -302,7 +301,7 @@ public class client extends JFrame {
 
 		JLabel lblNewLabel = new JLabel("Active Users");
 		lblNewLabel.setHorizontalAlignment(SwingConstants.LEFT);
-		lblNewLabel.setBounds(1159, 43, 95, 16);
+		lblNewLabel.setBounds(950, 25, 95, 16);
 		frame.getContentPane().add(lblNewLabel);
 
 		oneToNRadioBtn = new JRadioButton("Declare Word");
@@ -330,10 +329,10 @@ public class client extends JFrame {
 		btngrp.add(broadcastBtn);
 
 		whiteboard = new drawing_board();
-		
+
 		// whiteboard_panel = new drawing_board().get_panel();
 		whiteboard_panel = whiteboard.get_panel();
-		whiteboard_panel.setBounds(12, 25, 550, 600);
+		whiteboard_panel.setBounds(12, 25, 550, 500);
 		frame.getContentPane().add(whiteboard_panel);
 
 		frame.setVisible(true);

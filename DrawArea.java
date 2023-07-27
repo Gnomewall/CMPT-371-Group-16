@@ -79,7 +79,7 @@ public class DrawArea extends JComponent {
                     } else {
                         // Draw with the selected color or tool
                         g2.drawLine(oldX, oldY, currentX, currentY);
-                        
+
                         String message = "broadcast:paint," + oldX + ","+ oldY + ","+ currentX + ","+ currentY;
                         try {
                             DataOutputStream outStream = new DataOutputStream(socket.getOutputStream());
@@ -158,10 +158,9 @@ public class DrawArea extends JComponent {
         this.eraserMode = eraserMode;
 
         if (eraserMode) {
-            // Use the eraser if in eraser mode
-            g2.setColor(getBackground()); // Use the background color to simulate erasing
-            g2.fillRect(currentX - eraserSize / 2, currentY - eraserSize / 2, eraserSize,
-                    eraserSize);
+            // To use eraser, simply set paint color to background color.
+            g2.setPaint(getBackground());
+
         } else {
             // Else, change paint color and paint as normal.
             g2.setPaint(Color.black);

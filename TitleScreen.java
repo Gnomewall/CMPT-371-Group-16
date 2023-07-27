@@ -3,6 +3,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+//Client application.
+//Runs application, proceed to join game by entering their own username
 public class TitleScreen extends JFrame {
 
     public TitleScreen() {
@@ -23,7 +25,7 @@ public class TitleScreen extends JFrame {
         titlePanel.add(titleLabel, BorderLayout.NORTH);
 
         // creates a start game button
-        JButton startButton = new JButton("Start Game");
+        JButton startButton = new JButton("Join Game");
         // use this to change the size of it
         startButton.setPreferredSize(new Dimension(200, 100));
         startButton.addActionListener(new ActionListener() {
@@ -54,15 +56,25 @@ public class TitleScreen extends JFrame {
         setVisible(true);
     }
 
-    
+
     private void startGame() {
-        // closes the title screen and goes to our drawing_board
-        dispose(); 
-        SwingUtilities.invokeLater(() -> new drawing_board().show()); 
+        // closes the title screen and proceed to register (login) to game
+        dispose();
+        //TODO: transition to 'login'
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    login window = new login();
+                    window.getFrame().setVisible(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     private void showRules() {
-        String rules = "TODO: IDK what the actual rules are yet. Add it in later"; 
+        String rules = "TODO: IDK what the actual rules are yet. Add it in later";
         // displays a pane that has the rules on it
         JOptionPane.showMessageDialog(this, rules, "Game Rules", JOptionPane.INFORMATION_MESSAGE);
     }

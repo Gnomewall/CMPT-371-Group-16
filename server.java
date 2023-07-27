@@ -2,7 +2,6 @@ import java.awt.EventQueue;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashSet;
@@ -19,11 +18,11 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 
 
+//Server application
 public class server {
 	/*
 	 * References: https://www.youtube.com/watch?v=rd272SCl-XE
@@ -46,7 +45,7 @@ public class server {
 	private String keyWord;					//define chosen keyword string by player to draw
 	private boolean isGameOver = false;
 
-	
+
 
 
 	/**
@@ -91,15 +90,15 @@ public class server {
 					if (activeUserSet != null && activeUserSet.contains(uName)) { // if username is in use then we need to prompt user to enter new name
 						cOutStream.writeUTF("Username already taken");
 					} else {
-						allUsersList.put(uName, clientSocket); 
+						allUsersList.put(uName, clientSocket);
 						activeUserSet.add(uName);
 						cOutStream.writeUTF("");
-						activeDlm.addElement(uName); 
-						if (!allDlm.contains(uName)) 
+						activeDlm.addElement(uName);
+						if (!allDlm.contains(uName))
 							allDlm.addElement(uName);
-						activeClientList.setModel(activeDlm); 
+						activeClientList.setModel(activeDlm);
 						allUserNameList.setModel(allDlm);
-						serverMessageBoard.append("Client " + uName + " Connected...\n"); 
+						serverMessageBoard.append("Client " + uName + " Connected...\n");
 
 						new MsgRead(clientSocket, uName).start(); // Read Messages in new thread
 						new PrepareClientList().start(); // Update active clients list in new thread
@@ -114,97 +113,97 @@ public class server {
 	}
 
 	// Read incoming messages (This handles chat broadcasts and private messages to the server)
-	class MsgRead extends Thread { 
+	class MsgRead extends Thread {
 		Socket s;
 		String Id;
 
-		private MsgRead(Socket s, String uname) { 
+		private MsgRead(Socket s, String uname) {
 			this.s = s;
 			this.Id = uname;
 		}
 
 		@Override
 		public void run() {
-			while (allUserNameList != null && !allUsersList.isEmpty()) { 
+			while (allUserNameList != null && !allUsersList.isEmpty()) {
 				try {
 					String message = new DataInputStream(s.getInputStream()).readUTF(); // Read client message
-					System.out.println("message read ==> " + message); 
+					System.out.println("message read ==> " + message);
 					String[] msgList = message.split(":"); // Identifier; used to differentiate between public / private chat messages
 
 					if (msgList[0].equals("buzz")) {
 						Iterator<String> itr = allUsersList.keySet().iterator();
-                    	while (itr.hasNext()) {
-                       		String usrName = (String) itr.next();
-                        	if (!usrName.equalsIgnoreCase(Id)) {
-                            	try {
-                                	new DataOutputStream(((Socket) allUsersList.get(usrName)).getOutputStream())
-                                    	    .writeUTF("buzz");
-                            	} catch (Exception e) {
-                                	e.printStackTrace();
-                            	}
-                        	}
-                   		}
+						while (itr.hasNext()) {
+							String usrName = (String) itr.next();
+							if (!usrName.equalsIgnoreCase(Id)) {
+								try {
+									new DataOutputStream(((Socket) allUsersList.get(usrName)).getOutputStream())
+											.writeUTF("buzz");
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							}
+						}
 					} else if (msgList[0].equals("unbuzz")){
 						Iterator<String> itr = allUsersList.keySet().iterator();
-                    	while (itr.hasNext()) {
-                       		String usrName = (String) itr.next();
-                        	if (!usrName.equalsIgnoreCase(Id)) {
-                            	try {
-                                	new DataOutputStream(((Socket) allUsersList.get(usrName)).getOutputStream())
-                                    	    .writeUTF("unbuzz");
-                            	} catch (Exception e) {
-                                	e.printStackTrace();
-                            	}
-                        	}
-                   		}
+						while (itr.hasNext()) {
+							String usrName = (String) itr.next();
+							if (!usrName.equalsIgnoreCase(Id)) {
+								try {
+									new DataOutputStream(((Socket) allUsersList.get(usrName)).getOutputStream())
+											.writeUTF("unbuzz");
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							}
+						}
 					}
 
 					// === [THIS IS WHERE THE SERVER HANDLES PRIVATE MESSAGES FOR DECLARING A WORD TO DRAW] ===
-					if (msgList[0].equalsIgnoreCase("multicast")) { 
-							try {
-								
-								if (drawingPlayer != null && drawingPlayer.equalsIgnoreCase(Id) && keyWord == null) {
-									keyWord = msgList[1];
-									new DataOutputStream(s.getOutputStream())
-												.writeUTF("Your word is: " + msgList[1] + ". You may begin drawing!\n");
-									serverMessageBoard.append("Client " + drawingPlayer + " is drawing: " + keyWord + "\n");
-								} else if (drawingPlayer != null && drawingPlayer.equalsIgnoreCase(Id) && keyWord != null) {
-									new DataOutputStream(s.getOutputStream())
-												.writeUTF("ERROR: You have already declared a word.\n");
-								} else {
-									new DataOutputStream(s.getOutputStream())
-												.writeUTF("ERROR: It is not your turn to draw.\n");
-								}
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
+					if (msgList[0].equalsIgnoreCase("multicast")) {
+						try {
 
-					// === [THIS IS WHERE THE SERVER HANDLES PUBLIC CHAT BROADCAST] ===
+							if (drawingPlayer != null && drawingPlayer.equalsIgnoreCase(Id) && keyWord == null) {
+								keyWord = msgList[1];
+								new DataOutputStream(s.getOutputStream())
+										.writeUTF("Your word is: " + msgList[1] + ". You may begin drawing!\n");
+								serverMessageBoard.append("Client " + drawingPlayer + " is drawing: " + keyWord + "\n");
+							} else if (drawingPlayer != null && drawingPlayer.equalsIgnoreCase(Id) && keyWord != null) {
+								new DataOutputStream(s.getOutputStream())
+										.writeUTF("ERROR: You have already declared a word.\n");
+							} else {
+								new DataOutputStream(s.getOutputStream())
+										.writeUTF("ERROR: It is not your turn to draw.\n");
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+
+						// === [THIS IS WHERE THE SERVER HANDLES PUBLIC CHAT BROADCAST] ===
 					} else if (msgList[0].equalsIgnoreCase("broadcast")) {
 
 						// Iterate over all clients
-						Iterator<String> itr1 = allUsersList.keySet().iterator(); 
+						Iterator<String> itr1 = allUsersList.keySet().iterator();
 						while (itr1.hasNext()) {
 							String usrName = (String) itr1.next();
 
-								//added code from here, check/msg all users when guessed correctly 
-								if(keyWord != null && msgList[1].equalsIgnoreCase(keyWord)) {						//check if guess word is correct 
-									isGameOver = true;																	
-									if(Id.equals(usrName) && activeUserSet.contains(usrName)) {					  		//compare if user equals to user who guessed right 
-										new DataOutputStream(((Socket) allUsersList.get(usrName)).getOutputStream()) 	//retrieve user information and cast to socket 
-										.writeUTF("\nYou guessed it correctly");								 	//send string to outpustream of client who won
-									} else if(activeUserSet.contains(usrName)) {										//check for active clients 
-										new DataOutputStream(((Socket) allUsersList.get(usrName)).getOutputStream()) 	//send msg to all other clients saying who was winner 
-										.writeUTF("<"+Id+">" + msgList[1]+ "\n\n"+Id+" is winner!");				
-									} else {
-										new DataOutputStream(s.getOutputStream())
-										.writeUTF("Message couldn't be delivered to user " + usrName + " because it is disconnected.\n");
-									}					
-									//to here 
+							//added code from here, check/msg all users when guessed correctly
+							if(keyWord != null && msgList[1].equalsIgnoreCase(keyWord)) {						//check if guess word is correct
+								isGameOver = true;
+								if(Id.equals(usrName) && activeUserSet.contains(usrName)) {					  		//compare if user equals to user who guessed right
+									new DataOutputStream(((Socket) allUsersList.get(usrName)).getOutputStream()) 	//retrieve user information and cast to socket
+											.writeUTF("\nYou guessed it correctly");								 	//send string to outpustream of client who won
+								} else if(activeUserSet.contains(usrName)) {										//check for active clients
+									new DataOutputStream(((Socket) allUsersList.get(usrName)).getOutputStream()) 	//send msg to all other clients saying who was winner
+											.writeUTF("<"+Id+">" + msgList[1]+ "\n\n"+Id+" is winner!");
+								} else {
+									new DataOutputStream(s.getOutputStream())
+											.writeUTF("Message couldn't be delivered to user " + usrName + " because it is disconnected.\n");
+								}
+								//to here
 
-								} else if (!usrName.equalsIgnoreCase(Id)) { // we don't need to send message to ourself, so we check for our Id
+							} else if (!usrName.equalsIgnoreCase(Id)) { // we don't need to send message to ourself, so we check for our Id
 								try {
-									if (activeUserSet.contains(usrName)) { 
+									if (activeUserSet.contains(usrName)) {
 										new DataOutputStream(((Socket) allUsersList.get(usrName)).getOutputStream())
 												.writeUTF("< " + Id + " >" + msgList[1]);
 									} else {
@@ -212,27 +211,27 @@ public class server {
 												.writeUTF("Message couldn't be delivered to user " + usrName + " because it is disconnected.\n");
 									}
 								} catch (Exception e) {
-									e.printStackTrace(); 
+									e.printStackTrace();
 								}
 							}
 						}
-						
+
 					}
-						else if (msgList[0].equalsIgnoreCase("exit")) { 
+					else if (msgList[0].equalsIgnoreCase("exit")) {
 						activeUserSet.remove(Id); // Remove client from active user set
 						serverMessageBoard.append(Id + " disconnected....\n");
 
 						new PrepareClientList().start(); // Update active user list on UI
 
-						Iterator<String> itr = activeUserSet.iterator(); 
+						Iterator<String> itr = activeUserSet.iterator();
 						while (itr.hasNext()) {
 							String usrName2 = (String) itr.next();
-							if (!usrName2.equalsIgnoreCase(Id)) { 
+							if (!usrName2.equalsIgnoreCase(Id)) {
 								try {
 									if(!keyWord.isEmpty()) {					//send msg to disconnected client 
 										new DataOutputStream(((Socket) allUsersList.get(usrName2)).getOutputStream())
-										.writeUTF(Id + " disconnected..."); // notify all other active user for disconnection of a user
-									} 
+												.writeUTF(Id + " disconnected..."); // notify all other active user for disconnection of a user
+									}
 								} catch (Exception e) {
 									e.printStackTrace();
 								}
@@ -240,25 +239,25 @@ public class server {
 							}
 						}
 						//added code here, Remove all users from allUsersList
-						if(keyWord.isEmpty()) {						 
-						allUsersList.remove(Id);					//remove the user from the list from all user
-						allDlm.removeElement(Id);					//GUI representation of the list 
-						}		
+						if(keyWord.isEmpty()) {
+							allUsersList.remove(Id);					//remove the user from the list from all user
+							allDlm.removeElement(Id);					//GUI representation of the list
+						}
 						//to here 
 
 						activeDlm.removeElement(Id); // Remove client from JList
 						activeClientList.setModel(activeDlm); // Update active user list
-						allUserNameList.setModel(allDlm);		
+						allUserNameList.setModel(allDlm);
 
 					}
-					
+
 					//added code here, reset the values when game restarts 
-					if(isGameOver) {				
-						isGameOver = false;			
+					if(isGameOver) {
+						isGameOver = false;
 						keyWord = "";
-					}		
+					}
 					//to here 
-					
+
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -279,7 +278,7 @@ public class server {
 				if (ids.length() != 0) { // Trim list
 					ids = ids.substring(0, ids.length() - 1);
 				}
-				itr = activeUserSet.iterator(); 
+				itr = activeUserSet.iterator();
 				while (itr.hasNext()) { // Send list of all users
 					String key = (String) itr.next();
 					try {
