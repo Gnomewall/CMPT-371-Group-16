@@ -178,6 +178,7 @@ public class client extends JFrame {
 		clientTypingBoard.setBounds(600, 450, 300, 80);
 		frame.getContentPane().add(clientTypingBoard);
 		clientTypingBoard.setColumns(10);
+
 		// should only show the text box if a person is buzzing in
 		clientTypingBoard.setVisible(buzzing);
 
@@ -273,7 +274,7 @@ public class client extends JFrame {
 				}
 			}
 		});
-		clientSendMsgBtn.setBounds(950, 450, 200, 84);
+		clientSendMsgBtn.setBounds(950, 450, 90, 84);
 		frame.getContentPane().add(clientSendMsgBtn);
 
 		clientActiveUsersList = new JList();
@@ -295,7 +296,7 @@ public class client extends JFrame {
 				}
 			}
 		});
-		clientKillProcessBtn.setBounds(1303, 533, 193, 84);
+		clientKillProcessBtn.setBounds(1050, 450, 90, 84);
 		frame.getContentPane().add(clientKillProcessBtn);
 		// END OF KILL BUTTON
 
@@ -311,7 +312,7 @@ public class client extends JFrame {
 			}
 		});
 		// oneToNRadioBtn.setSelected(true); // width 72
-		oneToNRadioBtn.setBounds(1370, 24, 120, 25);
+		oneToNRadioBtn.setBounds(1050, 25, 120, 25);
 		frame.getContentPane().add(oneToNRadioBtn);
 
 		broadcastBtn = new JRadioButton("Chat");
