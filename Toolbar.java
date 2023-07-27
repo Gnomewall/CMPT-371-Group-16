@@ -10,10 +10,15 @@ public class Toolbar extends JToolBar {
     private DrawArea drawArea;
     private boolean eraserSelected = false;
 
+    private boolean isDrawing;
     private Socket socket;
 
     public void setSocket(Socket s) {
         socket = s;
+    }
+
+    public void setIsDrawing(boolean b) {
+        isDrawing = b;
     }
 
     public Toolbar(DrawArea drawArea) {
@@ -39,10 +44,12 @@ public class Toolbar extends JToolBar {
         eraserButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                eraserSelected = true;
-                drawArea.setEraserMode(eraserSelected);
-                drawArea.setBackground(Color.white);
-                drawArea.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR)); // Change cursor to crosshair
+                if (isDrawing) {
+                    eraserSelected = true;
+                    drawArea.setEraserMode(eraserSelected);
+                    drawArea.setBackground(Color.white);
+                    drawArea.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR)); // Change cursor to crosshair
+                }
             }
         });
 
@@ -50,10 +57,12 @@ public class Toolbar extends JToolBar {
         pencilButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                eraserSelected = false;
-                drawArea.setEraserMode(eraserSelected);
-                // drawArea.setBackground(Color.white);
-                drawArea.setCursor(pencilCursor); // Change cursor back to default
+                if (isDrawing) {
+                    eraserSelected = false;
+                    drawArea.setEraserMode(eraserSelected);
+                    // drawArea.setBackground(Color.white);
+                    drawArea.setCursor(pencilCursor); // Change cursor back to default
+                }
             }
         });
 
@@ -61,19 +70,21 @@ public class Toolbar extends JToolBar {
         clearButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Clear the drawing area
-                drawArea.clear();
-                eraserSelected = false;
-                drawArea.setEraserMode(eraserSelected);
-                drawArea.setCursor(pencilCursor);
-
-
-                String message = "broadcast:erase,all,clear";
-                try {
-                    DataOutputStream outStream = new DataOutputStream(socket.getOutputStream());
-                    outStream.writeUTF(message);
-                } catch (Exception excep) {
-                    excep.printStackTrace();
+                if (isDrawing) {
+                    // Clear the drawing area
+                    drawArea.clear();
+                    eraserSelected = false;
+                    drawArea.setEraserMode(eraserSelected);
+                    drawArea.setCursor(pencilCursor);
+                    
+                    
+                    String message = "broadcast:erase,all,clear";
+                    try {
+                        DataOutputStream outStream = new DataOutputStream(socket.getOutputStream());
+                        outStream.writeUTF(message);
+                    } catch (Exception excep) {
+                        excep.printStackTrace();
+                    }
                 }
             }
         });

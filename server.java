@@ -46,8 +46,6 @@ public class server {
 	private boolean isGameOver = false;
 
 
-
-
 	/**
 	 * Launch the application.
 	 */
@@ -358,6 +356,11 @@ public class server {
 						if (activeUserSet.contains(usrName)) {
 							new DataOutputStream(((Socket) allUsersList.get(usrName)).getOutputStream())
 									.writeUTF("\nPLAYER " + drawingPlayer + " WILL BE DRAWING NEXT!\n" + drawingPlayer + ", PLEASE DECLARE A WORD.\n");
+
+							if (usrName.equals(drawingPlayer)) {
+								System.out.println("SERVER: SENDING CONTROL MESSAGE - WHITEBOARD");
+								new DataOutputStream(((Socket) allUsersList.get(usrName)).getOutputStream()).writeUTF("control,setdrawing,true");
+							}
 						}
 					} catch (Exception excep) {
 						excep.printStackTrace(); // throw exceptions

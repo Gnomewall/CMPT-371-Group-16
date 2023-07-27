@@ -132,6 +132,11 @@ public class client extends JFrame {
 							// TESTING FOR ERASER
 							System.out.println("Clearing!");
 							whiteboard.drawArea.clear();
+						} else if (mtemp != null && mtemp.equals("control,setdrawing,true")) {
+							// TESTING FOR ERASER
+							System.out.println("Control message successful!");
+							whiteboard.drawArea.setIsDrawing(true);
+							whiteboard.toolbar.setIsDrawing(true);
 						}
 						else {
 							clientMessageBoard.append("" + m + "\n"); // otherwise print on the clients message board
@@ -279,7 +284,7 @@ public class client extends JFrame {
 
 		clientActiveUsersList = new JList();
 		clientActiveUsersList.setToolTipText("Active Users");
-		clientActiveUsersList.setBounds(950, 50, 200, 375);
+		clientActiveUsersList.setBounds(950, 50, 200, 300);
 		frame.getContentPane().add(clientActiveUsersList);
 
 		// THIS IS THE KILL BUTTON
@@ -312,7 +317,7 @@ public class client extends JFrame {
 			}
 		});
 		// oneToNRadioBtn.setSelected(true); // width 72
-		oneToNRadioBtn.setBounds(1050, 25, 120, 25);
+		oneToNRadioBtn.setBounds(950, 375, 120, 25);
 		frame.getContentPane().add(oneToNRadioBtn);
 
 		broadcastBtn = new JRadioButton("Chat");
@@ -322,7 +327,7 @@ public class client extends JFrame {
 				clientActiveUsersList.setEnabled(false);
 			}
 		});
-		broadcastBtn.setBounds(1250, 24, 107, 25);
+		broadcastBtn.setBounds(950, 400, 107, 25);
 		frame.getContentPane().add(broadcastBtn);
 
 		ButtonGroup btngrp = new ButtonGroup();

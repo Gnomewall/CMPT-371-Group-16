@@ -26,6 +26,7 @@ public class DrawArea extends JComponent {
     private boolean eraserMode = false;
     private int eraserSize = 10;
 
+    private boolean isDrawing;
     private Socket socket;
 
     public DrawArea() {
@@ -58,42 +59,44 @@ public class DrawArea extends JComponent {
 
         addMouseMotionListener(new MouseMotionAdapter() {
             public void mouseDragged(MouseEvent e) {
-                // coord x,y when drag mouse
-                currentX = e.getX();
-                currentY = e.getY();
-
-                if (g2 != null) {
-                    if (eraserMode) {
-                        // Use the eraser if in eraser mode
-                        g2.setColor(getBackground()); // Use the background color to simulate erasing
-                        g2.fillRect(currentX - eraserSize / 2, currentY - eraserSize / 2, eraserSize,
-                                eraserSize);
-
-                        String message = "broadcast:erase," + currentX + ","+ currentY;
-                        try {
-                            DataOutputStream outStream = new DataOutputStream(socket.getOutputStream());
-                            outStream.writeUTF(message);
-                        } catch (Exception excep) {
-                            excep.printStackTrace();
+                if (isDrawing) {
+                    // coord x,y when drag mouse
+                    currentX = e.getX();
+                    currentY = e.getY();
+                    
+                    if (g2 != null) {
+                        if (eraserMode) {
+                            // Use the eraser if in eraser mode
+                            g2.setColor(getBackground()); // Use the background color to simulate erasing
+                            g2.fillRect(currentX - eraserSize / 2, currentY - eraserSize / 2, eraserSize,
+                                    eraserSize);
+                        
+                            String message = "broadcast:erase," + currentX + ","+ currentY;
+                            try {
+                                DataOutputStream outStream = new DataOutputStream(socket.getOutputStream());
+                                outStream.writeUTF(message);
+                            } catch (Exception excep) {
+                                excep.printStackTrace();
+                            }
+                        } else {
+                            // Draw with the selected color or tool
+                            g2.drawLine(oldX, oldY, currentX, currentY);
+                        
+                            String message = "broadcast:paint," + oldX + ","+ oldY + ","+ currentX + ","+ currentY;
+                            try {
+                                DataOutputStream outStream = new DataOutputStream(socket.getOutputStream());
+                                outStream.writeUTF(message);
+                            } catch (Exception excep) {
+                                excep.printStackTrace();
+                            }
                         }
-                    } else {
-                        // Draw with the selected color or tool
-                        g2.drawLine(oldX, oldY, currentX, currentY);
-
-                        String message = "broadcast:paint," + oldX + ","+ oldY + ","+ currentX + ","+ currentY;
-                        try {
-                            DataOutputStream outStream = new DataOutputStream(socket.getOutputStream());
-                            outStream.writeUTF(message);
-                        } catch (Exception excep) {
-                            excep.printStackTrace();
-                        }
+                    
+                        // refresh draw area to repaint
+                        repaint();
+                        // store current coords x,y as olds x,y
+                        oldX = currentX;
+                        oldY = currentY;
                     }
-
-                    // refresh draw area to repaint
-                    repaint();
-                    // store current coords x,y as olds x,y
-                    oldX = currentX;
-                    oldY = currentY;
                 }
             }
         });
@@ -102,6 +105,10 @@ public class DrawArea extends JComponent {
 
     public void setSocket(Socket s) {
         socket = s;
+    }
+
+    public void setIsDrawing(boolean b) {
+        isDrawing = b;
     }
 
     // ****************************************************************************
