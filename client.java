@@ -19,6 +19,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 public class client extends JFrame {
 
@@ -84,6 +85,7 @@ public class client extends JFrame {
 			new Read().start(); // create a new thread for reading the messages
 		} catch (Exception ex) {
 			ex.printStackTrace();
+			break;
 		}
 	}
 
@@ -97,10 +99,14 @@ public class client extends JFrame {
 					System.out.println("inside read thread : " + m); // print message for testing purpose
 
 					if (m.equals("buzz")){
+						buzzerBtn.setText("Disabled");
 						buzzerEnabled = false; // disable our buzzer
 						clientTypingBoard.setVisible(buzzerEnabled);
+						
 					}else if (m.equals("unbuzz")) {
+						buzzerBtn.setText("Buzzer");
 						buzzerEnabled = true; // reenable our buzzer
+						
 					}
 
 					else if (m.contains(":;.,/=")) { // prefix(i know its random)
