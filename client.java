@@ -67,7 +67,6 @@ public class client extends JFrame {
 			new Read().start(); // create a new thread for reading the messages
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			break;
 		}
 	}
 
