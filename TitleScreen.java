@@ -9,7 +9,7 @@ public class TitleScreen extends JFrame {
 
     public TitleScreen() {
         // this sets the text on top of the window
-        setTitle("TODO: Still need to name the game");
+        setTitle("Scribbles");
         // set the opening screen to be the same size as the game
         setSize(600, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -18,11 +18,6 @@ public class TitleScreen extends JFrame {
         // creates a new jpanel for our entry screen
         JPanel titlePanel = new JPanel();
         titlePanel.setLayout(new BorderLayout());
-
-        // this puts a label on the actual panel. Will probably put a fancy title here
-        JLabel titleLabel = new JLabel("TODO: Still need to name the game");
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        titlePanel.add(titleLabel, BorderLayout.NORTH);
 
         // creates a start game button
         JButton startButton = new JButton("Join Game");
