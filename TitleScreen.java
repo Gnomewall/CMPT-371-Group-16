@@ -74,7 +74,7 @@ public class TitleScreen extends JFrame {
     }
 
     private void showRules() {
-        String rules = "TODO: IDK what the actual rules are yet. Add it in later";
+        String rules = "The objective of the game is to guess what the drawer is drawing.\n Should a player think they know what is being drawn, they must first hit the buzzer, allowing them exlusive access to guessing.\n Should the guess correctly, they win the round.";
         // displays a pane that has the rules on it
         JOptionPane.showMessageDialog(this, rules, "Game Rules", JOptionPane.INFORMATION_MESSAGE);
     }
