@@ -41,31 +41,13 @@ public class client extends JFrame {
 
 	private boolean buzzing = false;
 	private boolean buzzerEnabled = true;
+	private	JButton buzzerBtn;
 
 	DataInputStream inputStream;
 	DataOutputStream outStream;
 	DefaultListModel<String> dm;
 	String id, clientIds = "";
 
-	/**
-	 * Launch the application.
-	 */
-	// public static void main(String[] args) {
-	// EventQueue.invokeLater(new Runnable() {
-	// public void run() {
-	// try {
-	// ClientView window = new ClientView();
-	// window.frame.setVisible(true);
-	// } catch (Exception e) {
-	// e.printStackTrace();
-	// }
-	// }
-	// });
-	// }
-
-	/**
-	 * Create the application.
-	 */
 
 	public client() {
 		initialize();
@@ -98,17 +80,21 @@ public class client extends JFrame {
 					// seperated clientsIds>
 					System.out.println("inside read thread : " + m); // print message for testing purpose
 
-					if (m.equals("buzz")){
-						buzzerBtn.setText("Disabled");
-						buzzerEnabled = false; // disable our buzzer
-						clientTypingBoard.setVisible(buzzerEnabled);
-						
-					}else if (m.equals("unbuzz")) {
-						buzzerBtn.setText("Buzzer");
-						buzzerEnabled = true; // reenable our buzzer
-						
+					if (m.equals("buzz")) {
+						SwingUtilities.invokeLater(() -> {
+							System.out.println("Disabling Buzzer");
+							buzzerBtn.setText("Disabled");
+							buzzerEnabled = false;
+							clientTypingBoard.setVisible(buzzerEnabled);
+						});
+					} else if (m.equals("unbuzz")) {
+						SwingUtilities.invokeLater(() -> {
+							System.out.println("Enabling Buzzer");
+							buzzerBtn.setText("Buzzer");
+							buzzerEnabled = true;
+						});
 					}
-
+					
 					else if (m.contains(":;.,/=")) { // prefix(i know its random)
 						m = m.substring(6); // comma separated all active user ids
 						dm.clear(); // clear the list before inserting fresh elements
@@ -194,19 +180,20 @@ public class client extends JFrame {
 		clientTypingBoard.setVisible(buzzing);
 
 		// buzzer button
-		JButton buzzerBtn = new JButton("Buzzer");
+		buzzerBtn = new JButton("Buzzer");
 		buzzerBtn.setBounds(600, 450, 300, 80);
 		buzzerBtn.setBackground(Color.RED);
 		frame.getContentPane().add(buzzerBtn);
 		buzzerBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (buzzerEnabled) {
-					buzzing = true; // toggles the buzzing flag so that the text box will show
+					buzzing = !buzzing; // toggles the buzzing flag so that the text box will show
 					clientTypingBoard.setVisible(buzzing); // makes the text box visible
+					buzzerBtn.setVisible(!buzzing);
 					try {
-						outStream.writeUTF("buzz"); // sends a message to server that someone is buzzing
+						outStream.writeUTF(buzzing ? "buzz" : "unbuzz");; // sends a message to server that someone is buzzing
 					} catch (Exception ex) {
-						// TODO: handle exception
+						ex.printStackTrace();
 					}
 
 				}
