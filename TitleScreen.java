@@ -11,7 +11,7 @@ public class TitleScreen extends JFrame {
         // this sets the text on top of the window
         setTitle("Scribbles");
         // set the opening screen to be the same size as the game
-        setSize(600, 600);
+        setSize(600, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -22,7 +22,7 @@ public class TitleScreen extends JFrame {
         // creates a start game button
         JButton startButton = new JButton("Join Game");
         // use this to change the size of it
-        startButton.setPreferredSize(new Dimension(200, 100));
+        startButton.setPreferredSize(new Dimension(200, 400));
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -31,12 +31,12 @@ public class TitleScreen extends JFrame {
             }
         });
         // keeps the button centred
-        titlePanel.add(startButton, BorderLayout.CENTER);
+        titlePanel.add(startButton, BorderLayout.NORTH);
 
         // creates a button that will display the rules
         JButton rulesButton = new JButton("Rules");
         // sets size of the button
-        rulesButton.setPreferredSize(new Dimension(200, 50));
+        rulesButton.setPreferredSize(new Dimension(200, 200));
         rulesButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -45,7 +45,21 @@ public class TitleScreen extends JFrame {
             }
         });
         // will put this button under our start game button
-        titlePanel.add(rulesButton, BorderLayout.SOUTH);
+        titlePanel.add(rulesButton, BorderLayout.CENTER);
+
+        // create a button that allows the user to exit the game
+        JButton exitButton = new JButton("Exit");
+        // sets size of the button
+        exitButton.setPreferredSize(new Dimension(200, 200));
+        // when clicked, exit the game
+        exitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+        // puts the button at the bottom of the panel
+        titlePanel.add(exitButton, BorderLayout.SOUTH);
 
         add(titlePanel);
         setVisible(true);
