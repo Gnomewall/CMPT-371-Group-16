@@ -39,24 +39,6 @@ public class DrawArea extends JComponent {
             }
         });
 
-        // addMouseMotionListener(new MouseMotionAdapter() {
-        // public void mouseDragged(MouseEvent e) {
-        // // coord x,y when drag mouse
-        // currentX = e.getX();
-        // currentY = e.getY();
-
-        // if (g2 != null) {
-        // // draw line if g2 context not null
-        // g2.drawLine(oldX, oldY, currentX, currentY);
-        // // refresh draw area to repaint
-        // repaint();
-        // // store current coords x,y as olds x,y
-        // oldX = currentX;
-        // oldY = currentY;
-        // }
-        // }
-        // });
-
         addMouseMotionListener(new MouseMotionAdapter() {
             public void mouseDragged(MouseEvent e) {
                 if (isDrawing) {

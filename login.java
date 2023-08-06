@@ -16,28 +16,12 @@ import javax.swing.SwingConstants;
 public class login extends JFrame{
 
 	/*
-	 * References: https://www.youtube.com/watch?v=rd272SCl-XE
+	 * UI References: https://www.youtube.com/watch?v=rd272SCl-XE
 	 * 			   https://www.youtube.com/watch?v=ZzZeteJGncY
 	 * */
 	private JFrame frame;
 	private JTextField clientUserName;
 	private int port = 7070;
-
-	/**
-	 * Launch the application.
-	 */
-//	public static void main(String[] args) { // main function which will make UI visible
-//		EventQueue.invokeLater(new Runnable() {
-//			public void run() {
-//				try {
-//					login window = new login();
-//					window.frame.setVisible(true);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-//	}
 
 	/**
 	 * Create the application.

@@ -25,7 +25,7 @@ import javax.swing.SwingConstants;
 //Server application
 public class server {
 	/*
-	 * References: https://www.youtube.com/watch?v=rd272SCl-XE
+	 * UI References: https://www.youtube.com/watch?v=rd272SCl-XE
 	 * 			   https://www.youtube.com/watch?v=ZzZeteJGncY
 	 * */
 
@@ -340,14 +340,6 @@ public class server {
 				int rnInt = rn.nextInt(activeUserSet.size());
 				serverMessageBoard.append("Chosen: " + sarr[rnInt] + "\n");
 				drawingPlayer = sarr[rnInt];
-
-				// Inform chosen player
-				// Socket tempSock = allUsersList.get(sarr[rnInt]);
-				// PrintWriter tempPw = null;
-				// try {
-				// 	tempPw = new PrintWriter(tempSock.getOutputStream());
-				// 	tempPw.println("You were selected to draw! Please declare your word.");
-				// } catch (Exception exc) {exc.printStackTrace();}
 
 				Iterator<String> itr1 = allUsersList.keySet().iterator(); // iterate over all users
 				while (itr1.hasNext()) {

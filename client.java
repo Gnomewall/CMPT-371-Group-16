@@ -24,7 +24,7 @@ import javax.swing.SwingUtilities;
 public class client extends JFrame {
 
 	/*
-	 * References: https://www.youtube.com/watch?v=rd272SCl-XE
+	 * UI References: https://www.youtube.com/watch?v=rd272SCl-XE
 	 * https://www.youtube.com/watch?v=ZzZeteJGncY
 	 */
 	private static final long serialVersionUID = 1L;
@@ -94,7 +94,7 @@ public class client extends JFrame {
 						});
 					}
 					
-					else if (m.contains(":;.,/=")) { // prefix(i know its random)
+					else if (m.contains(":;.,/=")) { 
 						m = m.substring(6); // comma separated all active user ids
 						dm.clear(); // clear the list before inserting fresh elements
 						StringTokenizer st = new StringTokenizer(m, ","); // split all the clientIds and add to dm below
@@ -120,11 +120,11 @@ public class client extends JFrame {
 							String[] mSplit = mtemp.split(",");
 							whiteboard.drawArea.eraseHelper(Integer.parseInt(mSplit[1]), Integer.parseInt(mSplit[2]));
 						} else if (mtemp != null && mtemp.equals("erase,all,clear")) {
-							// TESTING FOR ERASER
+							// TESTING FOR CLEARING
 							System.out.println("Clearing!");
 							whiteboard.drawArea.clear();
 						} else if (mtemp != null && mtemp.equals("control,setdrawing,true")) {
-							// TESTING FOR ERASER
+							// TESTING FOR CONTROL MESSAGE
 							System.out.println("Control message successful!");
 							whiteboard.drawArea.setIsDrawing(true);
 							whiteboard.toolbar.setIsDrawing(true);
@@ -132,8 +132,6 @@ public class client extends JFrame {
 						else {
 							clientMessageBoard.append("" + m + "\n"); // otherwise print on the clients message board
 						}
-						// TESTING
-						// whiteboard.drawArea.drawHelper(12, 25, 100,250);
 
 						// added code here, disconnect all users and close client frame
 						if (m.endsWith("winner!") || m.endsWith("correctly")) {
@@ -207,10 +205,9 @@ public class client extends JFrame {
 				try {
 					outStream.writeUTF("unbuzz"); // sends a message to server that someone is buzzing
 				} catch (Exception ex) {
-					// TODO: handle exception
+					ex.printStackTrace();
 				}
 				// hides the text field again and shows the buzzer if the user sends a guess
-				// maybe add a timer?
 				clientTypingBoard.setVisible(buzzing);
 				buzzerBtn.setVisible(!buzzing);
 				String textAreaMessage = clientTypingBoard.getText(); // get the message from textbox
@@ -222,19 +219,7 @@ public class client extends JFrame {
 						int flag = 0; // flag used to check whether used has selected any client or not for multicast
 						if (oneToNRadioBtn.isSelected()) { // if 1-to-N is selected then do this
 							cast = "multicast";
-							// List<String> clientList = clientActiveUsersList.getSelectedValuesList(); //
-							// get all the users selected on UI
-							// if (clientList.size() == 0) // if no user is selected then set the flag for
-							// further use
-							// flag = 1;
-							// for (String selectedUsr : clientList) { // append all the usernames selected
-							// in a variable
-							// if (clientIds.isEmpty())
-							// clientIds += selectedUsr;
-							// else
-							// clientIds += "," + selectedUsr;
-							// }
-							// messageToBeSentToServer = cast + ":" + clientIds + ":" + textAreaMessage; //
+
 							// prepare message to be sent to server
 							messageToBeSentToServer = cast + ":" + textAreaMessage;
 						} else {
@@ -242,11 +227,6 @@ public class client extends JFrame {
 							// need to know userIds
 						}
 						if (cast.equalsIgnoreCase("multicast")) {
-							// if (flag == 1) { // for multicast check if no user was selected then prompt a
-							// message dialog
-							// JOptionPane.showMessageDialog(frame, "No user selected");
-							// }
-							// else { // otherwise just send the message to the user
 							outStream.writeUTF(messageToBeSentToServer);
 							clientTypingBoard.setText("");
 							clientMessageBoard.append("< You sent msg to server>" + textAreaMessage + "\n"); // show the
@@ -308,7 +288,7 @@ public class client extends JFrame {
 				clientActiveUsersList.setEnabled(true);
 			}
 		});
-		// oneToNRadioBtn.setSelected(true); // width 72
+
 		oneToNRadioBtn.setBounds(950, 375, 120, 25);
 		frame.getContentPane().add(oneToNRadioBtn);
 
@@ -328,7 +308,6 @@ public class client extends JFrame {
 
 		whiteboard = new drawing_board();
 
-		// whiteboard_panel = new drawing_board().get_panel();
 		whiteboard_panel = whiteboard.get_panel();
 		whiteboard_panel.setBounds(12, 25, 550, 500);
 		frame.getContentPane().add(whiteboard_panel);
